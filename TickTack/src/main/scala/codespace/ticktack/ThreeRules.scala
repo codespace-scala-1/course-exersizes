@@ -44,11 +44,56 @@ class ThreeRules extends Rules {
 
   }
 
-  override def isCorrect(ij: (Int, Int), f: Field, l: Label): Boolean = ???
+  override def isCorrect(ij: (Int, Int), f: Field, l: Label): Boolean =
+  {
+    val (i,j) = ij
+    i >= 0 && i < 3 && j >= 0 && j < 3 && f.get(i,j).isEmpty
+  }
 
   override def isWin(f: Field): Option[Label] =
   {
-    ???
+
+    def horizontalWin(row:Int):Option[Label]={
+      f.get(row,0) match {
+        case Some(l) => if (f.get(row,1)==Some(l) && f.get(row,2)==Some(l)) {
+                          Some(l)
+                        } else None
+        case None => None
+      }
+    }
+
+    def verticalWin(col:Int):Option[Label] = {
+      f.get(0,col) flatMap { l =>
+         if (f.get(1,col)==Some(l) && f.get(2,col)==Some(l))
+            Some(l)
+         else None
+      }
+    }
+
+    def diagonalWin():Option[Label] = {
+
+      def checkLeft(l:Label) = f.get(0,0) == f.get(2,2) && f.get(0,0)==l
+
+      def checkRight(l:Label) = f.get(2,0) == f.get(0,2) && f.get(2,0)==l
+
+      f.get(1,1) flatMap { l =>
+         if (checkLeft(l)||checkRight(l))
+           Some(l)
+         else
+           None
+      }
+
+    }
+
+    (0 until 3).find( horizontalWin(_).isDefined  )match {
+      case Some(row) => f.get(row,0)
+      case None =>
+        (0 until 3).find(verticalWin(_).isDefined) match {
+          case Some(col) => f.get(0,col)
+          case None => diagonalWin()
+        }
+    }
+
   }
 
   override def emptyField: Field = new ThreeField(3)
