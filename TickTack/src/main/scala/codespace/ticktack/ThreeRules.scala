@@ -9,6 +9,12 @@ class ThreeRules extends Rules {
 
   case class ThreeField(val data: IndexedSeq[IndexedSeq[Option[Label]]]) extends Field
   {
+
+    def this(n:Int) =
+    {
+      this(data = (1 to n) map { _ => (1 to n) map (_ => None)  })
+    }
+
     override def get(i:Int,j:Int):Option[Label]=
     {
       checkCorrect(i,j)
@@ -38,5 +44,12 @@ class ThreeRules extends Rules {
 
   }
 
+  override def isCorrect(ij: (Int, Int), f: Field, l: Label): Boolean = ???
 
+  override def isWin(f: Field): Option[Label] =
+  {
+    ???
+  }
+
+  override def emptyField: Field = new ThreeField(3)
 }
