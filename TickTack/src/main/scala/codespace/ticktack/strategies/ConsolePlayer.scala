@@ -5,7 +5,7 @@ import codespace.ticktack.{Field, Label, Player, Rules}
 class ConsolePlayer(label:Label,
                     rules:Rules) extends BasePlayer(label,rules) {
 
-  override def nextStep(f: Field): ((Int, Int), Player) = ???
+  override def nextStep(f: Field): Either[String,((Int, Int), Player)] = ???
 
   override def tell(s: String): Player = ???
 

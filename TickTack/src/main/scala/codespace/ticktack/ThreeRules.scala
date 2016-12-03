@@ -1,5 +1,7 @@
 package codespace.ticktack
 
+import scala.util.Try
+
 class ThreeRules extends Rules {
 
    //data
@@ -21,17 +23,19 @@ class ThreeRules extends Rules {
       data(i)(j)
     }
 
-    override def put(i: Int, j: Int, l: Label): Field =
+    override def put(i: Int, j: Int, l: Label): Either[String,Field] =
     {
-      checkCorrect(i,j)
-      get(i,j) match {
-        case Some(label) =>
-          throw new IllegalArgumentException("label already filled")
-        case None   =>
-          val nextRow: IndexedSeq[Option[Label]] = data(i).patch(j,Seq(Some(l)),j)
-          val nextData: IndexedSeq[IndexedSeq[Option[Label]]] = data.patch(i,Seq(nextRow),i)
-          ThreeField(nextData)
-      }
+     Try {
+       checkCorrect(i, j)
+       get(i, j) match {
+         case Some(label) =>
+           throw new IllegalArgumentException("label already filled")
+         case None =>
+           val nextRow: IndexedSeq[Option[Label]] = data(i).patch(j, Seq(Some(l)), j)
+           val nextData: IndexedSeq[IndexedSeq[Option[Label]]] = data.patch(i, Seq(nextRow), i)
+           ThreeField(nextData)
+       }
+     }.toEither.left.map(_.getMessage)
     }
 
     def checkCorrect(i:Int,j:Int):Unit =
@@ -72,9 +76,9 @@ class ThreeRules extends Rules {
 
     def diagonalWin():Option[Label] = {
 
-      def checkLeft(l:Label) = f.get(0,0) == f.get(2,2) && f.get(0,0)==l
+      def checkLeft(l:Label) = f.get(0,0) == f.get(2,2) && f.get(0,0)==Some(l)
 
-      def checkRight(l:Label) = f.get(2,0) == f.get(0,2) && f.get(2,0)==l
+      def checkRight(l:Label) = f.get(2,0) == f.get(0,2) && f.get(2,0)==Some(l)
 
       f.get(1,1) flatMap { l =>
          if (checkLeft(l)||checkRight(l))

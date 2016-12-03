@@ -4,7 +4,9 @@ import codespace.ticktack.{Field, Label, Player, Rules}
 
 class Recursive(label:Label, rules: Rules) extends BasePlayer(label,rules) {
 
-  override def nextStep(f: Field): ((Int, Int), Player) =
+  override def nextStep(f: Field): Either[String,((Int, Int), Player)] =
+   ???
+  /*
   {
     f.get(1,1) match {
       case None => ((1,1),this)
@@ -12,6 +14,7 @@ class Recursive(label:Label, rules: Rules) extends BasePlayer(label,rules) {
            checkNearest(1,1,f)
     }
   }
+  */
 
   def checkNearest(x:Int,y:Int,f:Field):((Int,Int),Player) =
   {
@@ -28,6 +31,7 @@ class Recursive(label:Label, rules: Rules) extends BasePlayer(label,rules) {
        }
      }
     ???
+
 
   }
 

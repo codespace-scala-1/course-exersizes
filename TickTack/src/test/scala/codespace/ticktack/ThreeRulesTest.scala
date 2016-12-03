@@ -13,7 +13,7 @@ class ThreeRulesTest extends FunSuite
    test("set field actually set field") {
      val rules = new ThreeRules
      val ef = rules.emptyField
-     val f1 = ef.put(0,0,CrossLabel)
+     val f1 = ef.put(0,0,CrossLabel).right.get
      assert(f1.get(0,0)===Some(CrossLabel))
    }
 

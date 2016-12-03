@@ -10,18 +10,28 @@ trait Game {
 
     def endOfGame: Boolean = rules.isWin(field) != None
 
-    def step():State =
+    def step():Either[String,State] =
     {
       if (endOfGame)
-        this
+        Left("Game Over")
       else {
+        for { ijn <- a.nextStep(field)
+              ((i, j), nextA) = ijn
+             nextField <- field.put(i, j, a.label)
+        } yield {
+          State(nextField, b, nextA)
+        }
+        /*
         val (ij,nextA) = a.nextStep(field)
         if (rules.isCorrect(ij,field,a.label)) {
-          val nextField = field.put(ij._1, ij._2, a.label)
-          State(nextField, b, nextA)
+          field.put(ij._1, ij._2, a.label) match {
+            case Left(message) =>     State(field,nextA.tell("Cell is busy"), b)
+            case Right(nextField) =>  State(nextField, b, nextA)
+          }
         }else{
           State(field,nextA.tell("Bad step"),b)
         }
+        */
       }
     }
 
@@ -32,7 +42,11 @@ trait Game {
   def play(a:Player,b:Player):Field = {
      var s = State(rules.emptyField,a,b)
      while(!s.endOfGame) {
-       s = s.step()
+       s = s.step() match {
+         case Left(message) => s.a.tell(message)
+                               s
+         case Right(s1) => s1
+       }
      }
      s.field
   }
