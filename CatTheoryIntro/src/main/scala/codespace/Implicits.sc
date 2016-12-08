@@ -1,3 +1,4 @@
+import scala.annotation.implicitAmbiguous
 import scala.languageFeature.implicitConversions
 
 //x.sqrt
@@ -66,14 +67,15 @@ object Sqrt
 
 Sqrt(200)
 
-implicit class WithSqrt[X](x:X)(implicit n:Numeric[X])
-{
 
-  def sqrt():Double = Sqrt(x)
+  implicit class WithSqrt[X](x: X)(implicit n: Numeric[X]) {
 
-  def ** (y:X):X = n.minus(x,y)
+    def sqrt(): Double = Sqrt(x)
 
-}
+    def **(y: X): X = n.minus(x, y)
+
+  }
+
 
 
 val x = 100
@@ -81,3 +83,7 @@ val x = 100
 x ** 99
 
 x.sqrt()
+
+import codespace.implicitexample._
+
+val s:String = 10

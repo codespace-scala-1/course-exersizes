@@ -9,20 +9,20 @@ trait Request
   def email:String = ???
 }
 
-trait Operations[M[_] <: Functor[_]]
+trait Operations
 {
 
-  def receiveRequest():M[Request] = ???
+  def receiveRequest():Option[Request] = ???
 
-  def validate(r:Request):M[Request] = ???
+  def validate(r:Request):Option[Request] = ???
 
-  def canonizeEmail(s:String):M[String] = ???
+  def canonizeEmail(s:String):Option[String] = ???
 
 }
 
 object A {
 
-  def process[M[_]](operations: Operations[M])(implicit mm: Monadic[M]): M[Int] = {
+  def process(operations: Operations): Option[Int] = {
 
     import operations._
 
