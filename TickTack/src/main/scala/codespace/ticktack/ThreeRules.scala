@@ -2,7 +2,7 @@ package codespace.ticktack
 
 import scala.util.Try
 
-class ThreeRules extends Rules {
+object ThreeRules extends Rules {
 
    //data
    //   data(0) ***

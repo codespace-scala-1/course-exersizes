@@ -21,17 +21,6 @@ trait Game {
         } yield {
           State(nextField, b, nextA)
         }
-        /*
-        val (ij,nextA) = a.nextStep(field)
-        if (rules.isCorrect(ij,field,a.label)) {
-          field.put(ij._1, ij._2, a.label) match {
-            case Left(message) =>     State(field,nextA.tell("Cell is busy"), b)
-            case Right(nextField) =>  State(nextField, b, nextA)
-          }
-        }else{
-          State(field,nextA.tell("Bad step"),b)
-        }
-        */
       }
     }
 

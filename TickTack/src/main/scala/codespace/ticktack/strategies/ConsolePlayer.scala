@@ -2,12 +2,9 @@ package codespace.ticktack.strategies
 
 import codespace.ticktack.{Field, Label, Player, Rules}
 
-class ConsolePlayer(label:Label,
+abstract class ConsolePlayer(label:Label,
                     rules:Rules) extends BasePlayer(label,rules) {
 
-  override def nextStep(f: Field): Either[String,((Int, Int), Player)] = ???
-
-  override def tell(s: String): Player = ???
 
   Console.println(s"Hi, my label is ${label}, this.label = ${this.label}")
 

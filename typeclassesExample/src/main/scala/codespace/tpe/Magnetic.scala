@@ -7,7 +7,6 @@ trait FunMagnit
 }
 
 
-
 object Magnetic {
 
 
