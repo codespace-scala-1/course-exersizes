@@ -1,4 +1,4 @@
-package com.phonebook
+package com.phonecode
 
 object StartPhonebook {
 
