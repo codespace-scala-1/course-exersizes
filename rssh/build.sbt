@@ -1,18 +1,25 @@
 import Dependencies._
 
+lazy val commonSettings = Seq(
+  organization := "com.example",
+  scalaVersion := "2.12.1",
+  libraryDependencies += scalaTest % Test
+)
+
+
 lazy val calculator  = (project in file("calculator")).
+  settings(commonSettings: _*).
   settings(
-    inThisBuild(List(
-      organization := "com.example",
-      scalaVersion := "2.12.1"
-    )),
-    name := "Calculator",
-    libraryDependencies += scalaTest % Test
+    name := "Calculator"
   )
 
 
 lazy val life  = (project in file("life")).
+   settings(commonSettings: _*).
    settings(
-    name := "Life",
-    libraryDependencies += scalaTest % Test
+    name := "Life"
    )
+
+lazy val root = (project in file(".")).
+  aggregate(calculator, life)
+
