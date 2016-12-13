@@ -11,7 +11,6 @@ object CmdMain extends Game {
     val field = play(aPlayer,bPlayer)
     println(field)
 
-    //hello
   }
 
 }
