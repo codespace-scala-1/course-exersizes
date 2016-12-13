@@ -10,6 +10,8 @@ object CmdMain extends Game {
     val bPlayer = new strategies.Recursive(CrossLabel,rules)
     val field = play(aPlayer,bPlayer)
     println(field)
+
+    //hello
   }
 
 }
