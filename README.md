@@ -78,5 +78,5 @@ The "game" is a zero-player game, meaning that its evolution is determined by it
 15. Совсем простые --- parseInt
                        parseIp
                        parse Ethernet Addr
-  Oб-ект с метолами + тест
+  Oб-ект с методами + тест
 
