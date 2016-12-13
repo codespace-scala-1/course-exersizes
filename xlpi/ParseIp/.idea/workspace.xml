@@ -8,6 +8,7 @@
     <ignored path="$PROJECT_DIR$/target/" />
     <ignored path="$PROJECT_DIR$/project/project/target/" />
     <ignored path="$PROJECT_DIR$/project/target/" />
+    <ignored path=".idea/dataSources.local.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -701,12 +702,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1481657736598</updated>
-      <workItem from="1481657739692" duration="103000" />
+      <workItem from="1481657739692" duration="269000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="103000" />
+    <option name="totallyTimeSpent" value="269000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1" y="27" width="1282" height="774" extended-state="6" />
