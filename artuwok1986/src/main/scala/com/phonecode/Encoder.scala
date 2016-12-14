@@ -16,7 +16,7 @@ class Encoder {
   val nineEncode = List('G', 'H', 'Z', 'g', 'h', 'z')
 
 
-  def numberToLetter(n: String): List[Char] = {
+  def numberToChars(n: String): List[Char] = {
     var resultList = List(' ')
 
     val x = n.toCharArray.filter(_ != '-').filter(_ != '/')

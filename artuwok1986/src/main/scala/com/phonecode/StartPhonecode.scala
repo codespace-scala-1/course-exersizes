@@ -6,7 +6,7 @@ object StartPhonecode {
 
     val phoneNumber: String = scala.io.StdIn.readLine()
     val encoder = new Encoder()
-    println(encoder.numberToLetter(phoneNumber))
-    println(encoder.toWord(encoder.numberToLetter(phoneNumber)))
+    println(encoder.numberToChars(phoneNumber))
+    println(encoder.toWord(encoder.numberToChars(phoneNumber)))
   }
 }
