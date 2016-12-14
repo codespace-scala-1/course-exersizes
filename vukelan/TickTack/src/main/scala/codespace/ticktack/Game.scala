@@ -8,7 +8,7 @@ trait Game {
   case class State(field:Field,a:Player,b:Player)
   {
 
-    def endOfGame: Boolean = rules.isWin(field) != None
+    def endOfGame: Boolean = rules.isWin(field).isDefined
 
     def step():Either[String,State] =
     {
