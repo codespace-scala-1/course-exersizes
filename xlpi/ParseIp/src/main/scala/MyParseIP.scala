@@ -1,7 +1,3 @@
-import java.net.InetAddress
-
-import scala.None
-import scala.util.Try
 
 object MyParseIp {
 
@@ -33,17 +29,6 @@ object MyParseIp {
             val StringsIP: Array[String] = strIP.split('.')
             val concatStringsIP: String = StringsIP(0) + StringsIP(1) + StringsIP(2) + StringsIP(3)
             Right(concatStringsIP.toLong)
-        } else
-            Left("Wrong IP template!, must be [0-255].[0-255].[0-255].[0-255]")
-    }
-
-    def IPstringToChar(strIP: String ): Either[String,Char] =
-    {
-        if (checkValidIP(strIP))
-        {
-            val StringsIP: Array[String] = strIP.split('.')
-            val concatStringsIP: String = StringsIP(0) + StringsIP(1) + StringsIP(2) + StringsIP(3)
-            Right(concatStringsIP.toLong.toChar)
         } else
             Left("Wrong IP template!, must be [0-255].[0-255].[0-255].[0-255]")
     }
