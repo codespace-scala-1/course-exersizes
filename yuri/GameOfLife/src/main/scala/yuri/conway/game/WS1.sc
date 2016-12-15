@@ -1,4 +1,4 @@
-import yuri.conway.game.{Alive, CellState, Dead}
+import yuri.conway.game._
 
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
@@ -31,6 +31,11 @@ ar22(0)(1) = 17
 ar22(0).toList
 
 ar(0).toList
+
+val ac:InitialConfiguration = Acorn
+
+Random.toString
+
 
 
 val l1 = List("1", "2", "3")

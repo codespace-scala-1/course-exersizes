@@ -1,6 +1,6 @@
 package com.phonecode
 
-import scala.collection.immutable.Seq
+import scala.collection.mutable
 
 class Encoder {
 
@@ -16,48 +16,32 @@ class Encoder {
   val nineEncode = List('G', 'H', 'Z', 'g', 'h', 'z')
 
 
-  def numberToChars(n: String): List[Char] = {
-    var resultList = List(' ')
+  def phoneNumberToChars(numbersList: List[String]): mutable.Map[String, List[Char]] = {
+    val resultMap = scala.collection.mutable.Map.empty[String, List[Char]]
+    for (phoneNumber <- numbersList) {
 
-    val x = n.toCharArray.filter(_ != '-').filter(_ != '/')
-
-    for (z <- x) {
-      if (z == '0') {
-        resultList = resultList ++ zeroEncode
+      var resultListOfChars: List[Char] = List()
+      val x = phoneNumber.toCharArray.filter(_ != '-').filter(_ != '/')
+      for (z <- x) z match {
+        case '0' => resultListOfChars = resultListOfChars ++ zeroEncode
+        case '1' => resultListOfChars = resultListOfChars ++ oneEncode
+        case '2' => resultListOfChars = resultListOfChars ++ twoEncode
+        case '3' => resultListOfChars = resultListOfChars ++ threeEncode
+        case '4' => resultListOfChars = resultListOfChars ++ fourEncode
+        case '5' => resultListOfChars = resultListOfChars ++ fiveEncode
+        case '6' => resultListOfChars = resultListOfChars ++ sixEncode
+        case '7' => resultListOfChars = resultListOfChars ++ sevenEncode
+        case '8' => resultListOfChars = resultListOfChars ++ eightEncode
+        case '9' => resultListOfChars = resultListOfChars ++ nineEncode
+        case _ => resultListOfChars
       }
-      if (z == '1') {
-        resultList = resultList ++ oneEncode
-      }
-      if (z == '2') {
-        resultList = resultList ++ twoEncode
-      }
-      if (z == '3') {
-        resultList = resultList ++ threeEncode
-      }
-      if (z == '4') {
-        resultList = resultList ++ fourEncode
-      }
-      if (z == '5') {
-        resultList = resultList ++ fiveEncode
-      }
-      if (z == '6') {
-        resultList = resultList ++ sixEncode
-      }
-      if (z == '7') {
-        resultList = resultList ++ sevenEncode
-      }
-      if (z == '8') {
-        resultList = resultList ++ eightEncode
-      }
-      if (z == '9') {
-        resultList = resultList ++ nineEncode
-      }
+      resultMap.put(new String(x), resultListOfChars.sorted)
     }
-    resultList.sorted
+    resultMap
   }
 
-  def toWord(arrayToCheck: List[Char]): List[String] = {
-    var finalWordsList: List[String] = List("")
+  def mappingToWord(arrayToCheck: List[Char]): List[String] = {
+    var finalWordsList: List[String] = List()
     for (word <- Dictionary.words) {
       val wordSet = word.toCharArray.filter(_ != '-').filter(_ != '/').toSet
       val arrayToCheckSet = arrayToCheck.toSet

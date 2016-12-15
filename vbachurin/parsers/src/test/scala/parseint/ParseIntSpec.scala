@@ -18,4 +18,12 @@ class TestParseInt extends FlatSpec with Matchers {
   "Parse Boolean" should "say hello" in {
     ParseInt.parseInt(true) shouldEqual Int.MinValue
   }
+  
+  "Parse empty String" should "say hello" in {
+    ParseInt.parseInt("") shouldEqual Int.MinValue
+  }
+  
+  "Parse invalid String" should "say hello" in {
+    ParseInt.parseInt("abc") shouldEqual Int.MinValue
+  }
 }
