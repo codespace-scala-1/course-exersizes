@@ -6,11 +6,9 @@ object CmdMain extends Game {
 
   def main(args:Array[String]):Unit =
   {
-    val aPlayer = new strategies.Recursive(ToeLabel,rules)
-    val bPlayer = new strategies.Recursive(CrossLabel,rules)
-    val field = play(aPlayer,bPlayer)
+    val aPlayer = new strategies.Recursive(ToeLabel, rules)
+    val bPlayer = new strategies.Recursive(CrossLabel, rules)
+    val field = play(aPlayer, bPlayer)
     println(field)
-
   }
-// another one
 }

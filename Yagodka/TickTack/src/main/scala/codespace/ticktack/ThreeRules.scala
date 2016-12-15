@@ -4,31 +4,22 @@ import scala.util.Try
 
 object ThreeRules extends Rules {
 
-   //data
-   //   data(0) ***
-   //   data(1) ***
-   //   data(2) ***
+  case class ThreeField(val data: IndexedSeq[IndexedSeq[Option[Label]]]) extends Field {
 
-  case class ThreeField(val data: IndexedSeq[IndexedSeq[Option[Label]]]) extends Field
-  {
-
-    def this(n:Int) =
-    {
-      this(data = (1 to n) map { _ => (1 to n) map (_ => None)  })
+    def this(n:Int) = {
+      this(data = (1 to n) map { _ => (1 to n) map (_ => None) })
     }
 
-    override def get(i:Int,j:Int):Option[Label]=
-    {
+    override def get(i: Int, j: Int) : Option[Label] = {
       checkCorrect(i,j)
       data(i)(j)
     }
 
-    override def put(i: Int, j: Int, l: Label): Either[String,Field] =
-    {
+    override def put(i: Int, j: Int, l: Label) : Either[String, Field] = {
      Try {
        checkCorrect(i, j)
        get(i, j) match {
-         case Some(label) =>
+         case Some(_) =>
            throw new IllegalArgumentException("label already filled")
          case None =>
            val nextRow: IndexedSeq[Option[Label]] = data(i).patch(j, Seq(Some(l)), j)
@@ -38,14 +29,12 @@ object ThreeRules extends Rules {
      }.toEither.left.map(_.getMessage)
     }
 
-    def checkCorrect(i:Int,j:Int):Unit =
-    {
+    def checkCorrect(i: Int, j: Int) : Unit = {
       require(i >= 0)
       require(i < data.length)
       require(j >= 0)
       require(j < data(0).length)
     }
-
   }
 
   override def isCorrect(ij: (Int, Int), f: Field, l: Label): Boolean =
