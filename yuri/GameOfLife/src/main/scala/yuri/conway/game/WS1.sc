@@ -1,5 +1,6 @@
 import yuri.conway.game.{Alive, CellState, Dead}
 
+import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
 val s = 0 until 10
@@ -30,6 +31,16 @@ ar22(0)(1) = 17
 ar22(0).toList
 
 ar(0).toList
+
+
+val l1 = List("1", "2", "3")
+val l2 = List("a", "b", "c")
+
+var res = ListBuffer()
+
+val q = for(s2 <- l2) { res = res + l1.map(s1 => s1 + " " + s2).toList }
+
+
 
 
 //(0 until 10).toList
