@@ -12,8 +12,7 @@ class Recursive(label:Label, rules: Rules) extends BasePlayer(label,rules) {
     }
   }
 
-  def checkNearest(x:Int,y:Int,f:Field):Either[String,((Int,Int),Player)] =
-  {
+  def checkNearest(x:Int,y:Int,f:Field):Either[String,((Int,Int),Player)] = {
      var retval: Option[(Int,Int)] = None
      for(cx <- 0 to 2;
          cy <- 0 to 2 if (cx!=x) || (cy!=y) ) {
@@ -29,20 +28,17 @@ class Recursive(label:Label, rules: Rules) extends BasePlayer(label,rules) {
      Left("Can't ")
   }
 
-  def checkNextStep(x:Int,y:Int,f:Field):Option[(Int,Int)]=
-  {
+  def checkNextStep(x: Int, y: Int, f: Field) : Option[(Int, Int)] = {
     f.put(x,y,label) match {
-      case Right(nextField) => ??? //Some((x,y))
-      case Left(message) => None
+      case Right(nextField) => Some((0,0))
+      case Left(_) => None
     }
   }
 
-  override def tell(s: String): Player =
-  {
+  override def tell(s: String): Player = {
     Console.println(s"Player $label receive message $s")
     this
   }
-
 }
 
 
