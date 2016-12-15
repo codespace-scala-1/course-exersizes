@@ -32,7 +32,7 @@ ar22(0).toList
 
 ar(0).toList
 
-val ac:InitialConfiguration = Acorn
+//val ac:InitialConfiguration = Acorn
 
 Random.toString
 
@@ -41,11 +41,14 @@ Random.toString
 val l1 = List("1", "2", "3")
 val l2 = List("a", "b", "c")
 
-var res = ListBuffer()
+var res = ListBuffer[String]()
 
-val q = for(s2 <- l2) { res = res + l1.map(s1 => s1 + " " + s2).toList }
+val q = for(s2 <- l2) { res ++= l1.map(s1 => s1 + s2) }
+
+res
 
 
+l1 ++ "cd"
 
 
 //(0 until 10).toList
