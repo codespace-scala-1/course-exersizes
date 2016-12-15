@@ -4,46 +4,54 @@ import scala.util.Try
 
 object ThreeRules extends Rules {
 
-   //data
-   //   data(0) ***
-   //   data(1) ***
-   //   data(2) ***
+  case class ThreeField(data: IndexedSeq[IndexedSeq[Option[Label]]]) extends Field {
 
-  case class ThreeField(val data: IndexedSeq[IndexedSeq[Option[Label]]]) extends Field
-  {
-
-    def this(n:Int) =
-    {
-      this(data = (1 to n) map { _ => (1 to n) map (_ => None)  })
+    def this(n:Int) = {
+      this(data = (1 to n) map { _ => (1 to n) map (_ => None) })
     }
 
-    override def get(i:Int,j:Int):Option[Label]=
-    {
+    override def get(i: Int, j: Int) : Option[Label] = {
       checkCorrect(i,j)
       data(i)(j)
     }
 
-    override def put(i: Int, j: Int, l: Label): Either[String,Field] =
-    {
+    override def put(i: Int, j: Int, l: Label) : Either[String, Field] = {
      Try {
        checkCorrect(i, j)
        get(i, j) match {
-         case Some(label) =>
+         case Some(_) =>
            throw new IllegalArgumentException("label already filled")
          case None =>
-           val nextRow: IndexedSeq[Option[Label]] = data(i).patch(j, Seq(Some(l)), j)
-           val nextData: IndexedSeq[IndexedSeq[Option[Label]]] = data.patch(i, Seq(nextRow), i)
+           val nextRow: IndexedSeq[Option[Label]] = data(i).patch(j, Seq(Some(l)), 1)
+           val nextData: IndexedSeq[IndexedSeq[Option[Label]]] = data.patch(i, Seq(nextRow), 1)
            ThreeField(nextData)
        }
      }.toEither.left.map(_.getMessage)
     }
 
-    def checkCorrect(i:Int,j:Int):Unit =
-    {
+    def checkCorrect(i: Int, j: Int) : Unit = {
       require(i >= 0)
       require(i < data.length)
       require(j >= 0)
       require(j < data(0).length)
+    }
+
+    override def isFull: Boolean = {
+      (for(cx <- 0 to 2;
+           cy <- 0 to 2
+           if get(cx, cy).isEmpty) yield (cx, cy))
+        .isEmpty
+    }
+
+    override def toString: String = {
+      var s = ""
+      for(cy <- 0 to 2){
+        s = s + "\n"
+        for(cx <- 0 to 2) {
+          s = s + get(cx,cy).getOrElse(" ")
+        }
+      }
+      s
     }
 
   }
@@ -54,12 +62,11 @@ object ThreeRules extends Rules {
     i >= 0 && i < 3 && j >= 0 && j < 3 && f.get(i,j).isEmpty
   }
 
-  override def isWin(f: Field): Option[Label] =
-  {
+  override def isWin(f: Field): Option[Label] = {
 
     def horizontalWin(row:Int):Option[Label]={
       f.get(row,0) match {
-        case Some(l) => if (f.get(row,1)==Some(l) && f.get(row,2)==Some(l)) {
+        case Some(l) => if (f.get(row, 1).contains(l) && f.get(row, 2).contains(l)) {
                           Some(l)
                         } else None
         case None => None
@@ -68,7 +75,7 @@ object ThreeRules extends Rules {
 
     def verticalWin(col:Int):Option[Label] = {
       f.get(0,col) flatMap { l =>
-         if (f.get(1,col)==Some(l) && f.get(2,col)==Some(l))
+         if (f.get(1, col).contains(l) && f.get(2, col).contains(l))
             Some(l)
          else None
       }
@@ -76,9 +83,9 @@ object ThreeRules extends Rules {
 
     def diagonalWin():Option[Label] = {
 
-      def checkLeft(l:Label) = f.get(0,0) == f.get(2,2) && f.get(0,0)==Some(l)
+      def checkLeft(l:Label) = f.get(0,0) == f.get(2,2) && f.get(0, 0).contains(l)
 
-      def checkRight(l:Label) = f.get(2,0) == f.get(0,2) && f.get(2,0)==Some(l)
+      def checkRight(l:Label) = f.get(2,0) == f.get(0,2) && f.get(2, 0).contains(l)
 
       f.get(1,1) flatMap { l =>
          if (checkLeft(l)||checkRight(l))
@@ -99,6 +106,8 @@ object ThreeRules extends Rules {
     }
 
   }
+
+  override def isDraw(f: Field): Boolean = isWin(f).isEmpty && f.isFull
 
   override def emptyField: Field = new ThreeField(3)
 }

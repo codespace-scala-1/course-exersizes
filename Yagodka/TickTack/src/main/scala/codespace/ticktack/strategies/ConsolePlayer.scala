@@ -1,19 +1,15 @@
 package codespace.ticktack.strategies
 
-import codespace.ticktack.{Field, Label, Player, Rules}
+import codespace.ticktack.{Label, Rules}
 
-abstract class ConsolePlayer(label:Label,
-                    rules:Rules) extends BasePlayer(label,rules) {
-
+abstract class ConsolePlayer(label: Label, rules: Rules) extends BasePlayer(label, rules) {
 
   Console.println(s"Hi, my label is ${label}, this.label = ${this.label}")
 
-  def stringToPos(code:String):Option[(Int,Int)] =
-  {
+  def stringToPos(code: String) : Option[(Int, Int)] = {
     if (code.length != 2) None
     else try {
-      val rexpr="([A-C])([0-3])".r
-      val l = rexpr.findAllIn(code)
+      val l = "([A-C])([0-3])".r.findAllIn(code)
       if (l.hasNext) {
         val x = l.group(0).charAt(0) - 'A'
         val y = l.group(1).charAt(0) - '0'
@@ -24,16 +20,13 @@ abstract class ConsolePlayer(label:Label,
       } else None
     } catch {
       case ex: Exception =>
-        // AA!!!! --- ex must be printed here.
         ex.printStackTrace()
         None
     }
-
   }
 
   def charToPos(ch:Char):Int =
     ch match {
       case 'A' | '0' => 0
     }
-
 }

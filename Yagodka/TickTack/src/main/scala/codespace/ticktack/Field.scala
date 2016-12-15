@@ -1,14 +1,12 @@
 package codespace.ticktack
 
-
-
 trait Field {
 
+  def get(i: Int, j: Int) : Option[Label]
 
-  def get(i:Int,j:Int):Option[Label]
+  def put(i: Int, j: Int, l: Label) : Either[String, Field]
 
-  def put(i:Int,j:Int,l:Label): Either[String,Field]
-
+  def isFull: Boolean
 
 }
 
