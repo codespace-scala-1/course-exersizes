@@ -9,7 +9,7 @@ object ParseInt {
   def parseInt[T](input: T): Int =
     Try(convertInt(input)) match {
       case Success(v) =>
-        convertInt(input)
+        v
       case Failure(e) =>
         Int.MinValue
     }

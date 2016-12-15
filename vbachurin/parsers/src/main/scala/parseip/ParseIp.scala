@@ -9,7 +9,7 @@ object ParseIp {
   def parseIp[T](input: String): Boolean =
     Try(checkIp(input)) match {
       case Success(v) =>
-        checkIp(input)
+        v
       case Failure(e) =>
         false
     }
