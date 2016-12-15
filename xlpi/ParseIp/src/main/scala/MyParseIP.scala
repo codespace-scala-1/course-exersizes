@@ -63,7 +63,7 @@ object MyParseIp {
 
             def main(args: Array[String]): Unit = {
 
-                val stringIP = io.StdIn.readLine("Enter IP, please? to parse it to Int or Long\n")
+                val stringIP = io.StdIn.readLine("Enter IP, please, to parse it to Int or Long\n")
 
                 parseLoop(stringIP)
 
