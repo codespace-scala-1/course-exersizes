@@ -168,12 +168,25 @@ class ComputerPlayer(label: Label, rules: Rules) extends BasePlayer(label, rules
 
     }
 
+    /* "makeSplit" step to center,
+    then step to corner cells
+    for example:
+        x - x
+        - x -
+        x - x
+     */
     def makeSplit: (Int,Int) = {
        if (f.get(1,1).isEmpty) (1,1)
-       else if (f.get(0,0) == None && f.get(0,1))
-
+       else {
+         val cornerCells = for (i <- 0 to 2 if i%2 ==0; j <- 0 to 2 if j%2==0) yield {(i,j)}
+         for (i <- cornerCells) {
+           if (f.get(i).isEmpty) i
+         }
+       }
     }
 
+    if (complete(f: ThreeField) != (-1,-1)) complete(f: ThreeField)
+    else makeSplit
 
   }
 
