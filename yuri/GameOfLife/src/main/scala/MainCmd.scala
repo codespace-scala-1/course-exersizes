@@ -32,7 +32,7 @@ object MainCmd {
 
     var c = 0
 
-    while(c < 20) {
+    while(c < 50) {
 
       f = f.next().right.get
       f.dump()
