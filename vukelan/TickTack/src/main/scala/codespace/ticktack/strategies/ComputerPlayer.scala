@@ -9,8 +9,8 @@ class ComputerPlayer(label: Label, rules: Rules) extends BasePlayer(label, rules
   method nextStep first call defence on the given field, then tries to attack
    */
   def nextStep(f: ThreeField): Either[String, ((Int, Int), Player)] = {
-    // read field
-    // return ((Int,Int),Player)
+    if (defence(f) != (-1,-1)) defence(f)
+    else attack(f)
   }
 
   // determine what is the opponent's label
@@ -84,8 +84,8 @@ class ComputerPlayer(label: Label, rules: Rules) extends BasePlayer(label, rules
            column = defenceRow(transponent(i))
            if column != -1) yield (column, i)
 
-    if (rowsToDefence.nonEmpty) rowsToDefence(0)
-    else if (columnsToDefens.nonEmpty) columnsToDefens(0)
+    if (rowsToDefence.nonEmpty) rowsToDefence.head
+    else if (columnsToDefens.nonEmpty) columnsToDefens.head
     else if (defenceDiagonal(f) != (-1, -1)) defenceDiagonal(f)
     else (-1, -1)
 
@@ -161,19 +161,30 @@ class ComputerPlayer(label: Label, rules: Rules) extends BasePlayer(label, rules
              column = completeRow(transponent(i))
              if column != -1) yield (column, i)
 
-      if (rowsToComplete.nonEmpty) rowsToComplete(0)
-      else if (columnsToComplete.nonEmpty) columnsToComplete(0)
+      if (rowsToComplete.nonEmpty) rowsToComplete.head
+      else if (columnsToComplete.nonEmpty) columnsToComplete.head
       else if (completeDiagonal(f) != (-1, -1)) completeDiagonal(f)
       else (-1, -1)
 
     }
 
-    def makeSplit: (Int,Int) = {
-       if (f.get(1,1).isEmpty) (1,1)
-       else if (f.get(0,0) == None && f.get(0,1))
-
+    /* "makeSplit" step to center,
+    then step to corner cells
+    for example:
+        x - x
+        - x -
+        x - x
+     */
+    def makeSplit: IndexedSeq[(Int, Int)] = {
+      if (f.get(1, 1).isEmpty) (1, 1)
+      else {
+        val cornerCells = for (i <- 0 to 2 if i % 2 == 0; j <- 0 to 2 if j % 2 == 0) yield {(i, j)}
+        for (i <- cornerCells if (f.get(i).isEmpty) yield {i}
+      }
     }
 
+    if (complete(f: ThreeField) != (-1, -1)) complete(f: ThreeField)
+    else makeSplit.head
 
   }
 
