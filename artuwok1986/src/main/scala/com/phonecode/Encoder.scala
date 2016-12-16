@@ -16,6 +16,7 @@ class Encoder {
   val nineEncode = List('G', 'H', 'Z', 'g', 'h', 'z')
 
 
+
   def phoneNumberToChars(numbersList: List[String]): mutable.Map[String, List[Char]] = {
     val resultMap = scala.collection.mutable.Map.empty[String, List[Char]]
     for (phoneNumber <- numbersList) {
