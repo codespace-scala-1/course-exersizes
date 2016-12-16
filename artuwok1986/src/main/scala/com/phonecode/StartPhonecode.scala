@@ -24,6 +24,6 @@ object StartPhonecode {
 
     val encoder = new Encoder()
     println(encoder.phoneNumberToChars(fileTel))
-  //  fileTel.foreach(x => println(encoder.mappingToWord(encoder.phoneNumberToChars(x))))
+    println(encoder.mappingToWord(encoder.phoneNumberToChars(fileTel)))
   }
 }
