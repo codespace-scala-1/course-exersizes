@@ -40,14 +40,18 @@ class Encoder {
     resultMap
   }
 
-  def mappingToWord(arrayToCheck: List[Char]): List[String] = {
-    var finalWordsList: List[String] = List()
-    for (word <- Dictionary.words) {
-      val wordSet = word.toCharArray.filter(_ != '-').filter(_ != '/').toSet
-      val arrayToCheckSet = arrayToCheck.toSet
-      val bool = wordSet.subsetOf(arrayToCheckSet)
-      if (bool) {
-        finalWordsList = finalWordsList ++ List(word)
+  def mappingToWord(arrayToCheck: mutable.Map[String, List[Char]]) = {
+    val finalWordsList: mutable.Map[String, List[String]] = mutable.Map()
+
+    for (zx <- arrayToCheck) {
+      val filteredDictionary = Dictionary.words.filter(x => x.length <= zx._1.length)
+      for (word <- filteredDictionary) {
+        val wordSet = word.toCharArray.toSet
+        val arrayToCheckSet = zx._2.toSet
+        val bool = wordSet.subsetOf(arrayToCheckSet)
+        if (bool) {
+          finalWordsList.put(zx._1, List(word))
+        }
       }
     }
     finalWordsList
