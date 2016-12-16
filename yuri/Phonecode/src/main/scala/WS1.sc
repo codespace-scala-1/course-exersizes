@@ -1,0 +1,1 @@
+val res = "abcdef".flatMap(c => (c + "."))

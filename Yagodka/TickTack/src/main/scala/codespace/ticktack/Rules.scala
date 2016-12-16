@@ -8,4 +8,6 @@ trait Rules {
 
   def emptyField: Field
 
+  def isDraw(f: Field): Boolean
+
 }

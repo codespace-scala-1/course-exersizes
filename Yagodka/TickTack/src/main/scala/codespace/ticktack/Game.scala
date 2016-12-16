@@ -6,7 +6,7 @@ trait Game {
 
   case class State(field: Field, a: Player, b: Player) {
 
-    def endOfGame: Boolean = rules.isWin(field).isDefined
+    def endOfGame: Boolean = field.isFull
 
     def step(): Either[String, State] = {
       if (endOfGame)
@@ -27,14 +27,10 @@ trait Game {
     while (!s.endOfGame) {
       s = s.step() match {
         case Left(message) => s.a.tell(message)
-          s
+                              s
         case Right(s1) => s1
       }
     }
-    // todo
-    println(s)
     s.field
   }
-
-
 }
