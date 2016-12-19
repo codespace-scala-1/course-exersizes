@@ -1,76 +1,82 @@
+import scala.collection.mutable.ArrayBuffer
 
-object MyParseIp {
+// parse IP: String to Array[Byte]
+object MyParser {
+/*
+  case class parseIp(inputString: String)   // TODO returned
+  {
+    // TODO require(inputString.toCharArray.foreach(i ))
 
-    def checkValidIP(strIP: String): Boolean =
-    {
-        if(strIP.contains('.') && (strIP.split('.').length == 4) &&
-          (strIP.split('.')(0).toInt >= 0) && (strIP.split('.')(0).toInt <=255) &&
-          (strIP.split('.')(1).toInt >= 0) && (strIP.split('.')(1).toInt <=255) &&
-            (strIP.split('.')(2).toInt >= 0) && (strIP.split('.')(2).toInt <=255) &&
-              (strIP.split('.')(3).toInt >= 0) && (strIP.split('.')(3).toInt <=255)) true
-        else false
+//    if (code.length != 2) None
+//    else try {
+//      val rexpr="([A-C])([0-3])".r
+//      val l = rexpr.findAllIn(code)
+//      if (l.hasNext) {
+//        val x = l.group(0).charAt(0) - 'A'
+//        val y = l.group(1).charAt(0) - '0'
+//        val xy = (x.toInt, y.toInt)
+//        if (x < 3 && x >= 0 && y >= 0 && y < 3) {
+//          Some(xy)
+//        } else None
+//      } else None
+//    } catch {
+//      case ex: Exception =>
+
+
+
+    def checkValidIP(ip: String): Boolean = {
+      val splitArray = ip.split('.')
+      val splitInt = List(splitArray(0).toInt, splitArray(1).toInt, splitArray(2).toInt, splitArray(3).toInt)
+      if (ip.contains('.') && (splitArray.length == 4) &&
+        (splitInt(0) >= 0) && (splitInt(0) <= 255) &&
+        (splitInt(1) >= 0) && (splitInt(1) <= 255) &&
+        (splitInt(2) >= 0) && (splitInt(2) <= 255) &&
+        (splitInt(3) >= 0) && (splitInt(3) <= 255)) true
+      else false
     }
+*/
 
-    def IPstringToInt(strIP: String ): Either[String,Int] =
-    {
-            if (checkValidIP(strIP))
-            {
-                val StringsIP: Array[String] = strIP.split('.')
-                val concatStringsIP: String = StringsIP(0) + StringsIP(1) + StringsIP(2) + StringsIP(3)
-                Right(concatStringsIP.toInt)
-            } else
-                Left("Wrong IP template!, must be [0-255].[0-255].[0-255].[0-255]")
-    }
 
-    def IPstringToLong(strIP: String ): Either[String,Long] =
-    {
-        if (checkValidIP(strIP))
-        {
-            val StringsIP: Array[String] = strIP.split('.')
-            val concatStringsIP: String = StringsIP(0) + StringsIP(1) + StringsIP(2) + StringsIP(3)
-            Right(concatStringsIP.toLong)
-        } else
-            Left("Wrong IP template!, must be [0-255].[0-255].[0-255].[0-255]")
-    }
 
-    def parseIp(input: String): Option[Long] =
-    {
-        IPstringToLong(input).toOption match {
-            case Some(value) => Some(value)
-            case None => None
+    def parseIp(inputP: String): Option[Array[Byte]] = {
+      try {
+        val splitArrayString = inputP.split('.')
+        val byteArr = new Array[Byte](4)
+        for (i <- 0 until byteArr.length) {
+          byteArr(i) = splitArrayString(i).toInt.toByte //TODO correct
         }
+        val byteArrOut0: Byte = (byteArr(0) & 0xFF).toByte
+        val byteArrOut1: Byte = (byteArr(1) & 0xFF).toByte
+        val byteArrOut2: Byte = (byteArr(2) & 0xFF).toByte
+        val byteArrOut3: Byte = (byteArr(3) & 0xFF).toByte
+        val byteOut = new Array[Byte](4)
+        byteOut(0) = byteArrOut0
+        byteOut(1) = byteArrOut1
+        byteOut(2) = byteArrOut2
+        byteOut(3) = byteArrOut3
+        Some(byteOut)
+      }
+      catch {
+        case e: Exception => None
+      }
     }
 
-    def parseLoop(input_line: String): Unit = {
-        if (IPstringToLong(input_line).toOption.isDefined)
-        {
-            IPstringToLong(input_line).toOption match {
-                case Some(value) => if (value > 2147483646) {
-                    val res = IPstringToLong(input_line).toOption.get
-                    println(s"Parser IP String->Long \n Input: String = $input_line \n" +
-                      s" Output: Long = $res")
-                } else {
-                    val res2 = IPstringToInt(input_line).toOption.get
-                    println(s"Parser IP String->Int \n Input: String = $input_line \n" +
-                      s" Output: Int = $res2")
-                }
-                case None => println("Wrong IP template!, must be [0-255].[0-255].[0-255].[0-255]")
-            }
-        }
-        else parseLoop(io.StdIn.readLine("Wrong IP template!, must be [0-255].[0-255].[0-255].[0-255]\n" +
-          "Enter only valid IP, please, to parse it to Int or Long\n"))
+
+  def main(args: Array[String]): Unit = {
+
+    val stringIP = io.StdIn.readLine("Enter IP, please, to parse it to Int or Long\n")
+
+    MyParser.parseIp(stringIP) match {
+      case Some(s) => println("result Array[Byte] = (" + s(0) +"," + s(1) +
+        ","  + s(2)+","  + s(3)+ ")")
+      case None => println("Wrong IP template!, must be [0-255].[0-255].[0-255].[0-255]")
     }
 
-            def main(args: Array[String]): Unit = {
 
-                val stringIP = io.StdIn.readLine("Enter IP, please, to parse it to Int or Long\n")
+    // use in other functions
+   // val ipToOption: Option[Long] = new parseIp(stringIP).parseIp(stringIP) // TODO change .get()? because None.get throw exception
 
-                parseLoop(stringIP)
-
-                // use in other functions
-                val resultIpLong: Long = parseIp(stringIP).get
-
-            }
+  }
 
 
 
