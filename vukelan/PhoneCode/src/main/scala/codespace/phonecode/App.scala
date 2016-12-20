@@ -10,6 +10,8 @@ object App {
     val numPattern = "[0-9]+".r
     val letterPattern = "[a-z,A-Z]+".r
 
+
+
     val digitLetters = for (l <- lineIterator) {
       val digit = numPattern.findFirstIn(l)
       val letters = letterPattern.findAllIn(l)
