@@ -176,10 +176,10 @@ class ComputerPlayer(label: Label, rules: Rules) extends BasePlayer(label, rules
         x - x
      */
     def makeSplit: IndexedSeq[(Int, Int)] = {
-      if (f.get(1, 1).isEmpty) (1, 1)
+      if (f.get(1, 1).isEmpty) IndexedSeq((1, 1))
       else {
         val cornerCells = for (i <- 0 to 2 if i % 2 == 0; j <- 0 to 2 if j % 2 == 0) yield {(i, j)}
-        for (i <- cornerCells if (f.get(i).isEmpty) yield {i}
+        for (i <- cornerCells if f.get(i).isEmpty) yield (i, i)
       }
     }
 
