@@ -1,16 +1,17 @@
 package codespace.ticktack.strategies
-
-import codespace.ticktack.ThreeRules.ThreeField
 import codespace.ticktack._
+import codespace.ticktack.ThreeRules._
 
 class ComputerPlayer(label: Label, rules: Rules) extends BasePlayer(label, rules) {
 
+  def nextStep(f: Field): Either[String, ((Int,Int),Player)] = ???
+
   /*
-  method nextStep first call defence on the given field, then tries to attack
+  method nextStep2 first call defence on the given field, then tries to attack
    */
-  def nextStep(f: ThreeField): Either[String, ((Int, Int), Player)] = {
-    if (defence(f) != (-1,-1)) defence(f)
-    else attack(f)
+  def nextStep2(f: ThreeField): Either[String, (Int, Int)] = {
+    if (defence(f) != (-1,-1)) Right(defence(f))
+    else Right(attack(f))
   }
 
   // determine what is the opponent's label
@@ -179,7 +180,7 @@ class ComputerPlayer(label: Label, rules: Rules) extends BasePlayer(label, rules
       if (f.get(1, 1).isEmpty) IndexedSeq((1, 1))
       else {
         val cornerCells = for (i <- 0 to 2 if i % 2 == 0; j <- 0 to 2 if j % 2 == 0) yield {(i, j)}
-        for (i <- cornerCells if f.get(i).isEmpty) yield (i, i)
+        for (i <- cornerCells if f.get(i._1,i._2).isEmpty) yield (i._1,i._2)
       }
     }
 
@@ -188,6 +189,6 @@ class ComputerPlayer(label: Label, rules: Rules) extends BasePlayer(label, rules
 
   }
 
-  override def tell(s: String) = ???
+  override def tell(s: String) = this
 
 }

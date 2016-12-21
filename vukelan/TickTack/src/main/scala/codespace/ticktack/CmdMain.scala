@@ -1,4 +1,5 @@
 package codespace.ticktack
+import codespace.ticktack._
 
 object CmdMain extends Game {
 

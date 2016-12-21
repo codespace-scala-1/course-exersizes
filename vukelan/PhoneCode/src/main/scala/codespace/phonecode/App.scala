@@ -75,7 +75,7 @@ object App {
       .flatMap(x => for (i <- x) yield (x, charToDigit.getOrElse(i, "+")))
     //    println(codes.mkString("--"))
 
-    // unfinished for comprehension varian
+    // unfinished for comprehension variant
     val digitLetters = for (l <- linesPhonecode) {
       val digit = numPattern.findFirstIn(l)
       val letters = letPattern.findAllIn(l)

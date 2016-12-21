@@ -1,6 +1,4 @@
 import codespace.ticktack._
-import codespace.ticktack.Label
-import codespace.ticktack.strategies.ComputerPlayer._
 
 val (c, t, n) = (Some(CrossLabel), Some(ToeLabel), None)
 

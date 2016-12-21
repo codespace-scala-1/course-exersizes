@@ -1,11 +1,10 @@
 package codespace.ticktack.strategies
 
-import codespace.ticktack.{Field, Label, Player, Rules}
+import codespace.ticktack.{Label, Rules, Field, Player}
 
 class Recursive(label: Label, rules: Rules) extends BasePlayer(label, rules) {
 
-  override def nextStep(f: Field): Either[String, ((Int, Int), Player)] =
-    ???
+  def nextStep(f: Field): Either[String, ((Int, Int), Player)] = ???
 
   /*1
   {
@@ -42,7 +41,7 @@ class Recursive(label: Label, rules: Rules) extends BasePlayer(label, rules) {
     //val antagon
   }
 
-  override def tell(s: String): Player = ???
+  def tell(s: String): Player = ???
 }
 
 
