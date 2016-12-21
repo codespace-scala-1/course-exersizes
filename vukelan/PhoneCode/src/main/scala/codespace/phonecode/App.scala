@@ -28,6 +28,10 @@ object App {
       Source
         .fromFile("/Users/johnsmith/IdeaProjects/course-exersizes/vukelan/PhoneCode/data/test.w")
         .getLines()
+          .toArray
+
+    val words2 = words
+
 
     val wordsTranslated = words
       .map(word =>
@@ -35,10 +39,21 @@ object App {
       )
       .map(x => (x._1, x._2.mkString))
       .filter(!_._2.contains("+"))
-      .map(x => (x._2, x._1))
+//      .map(x => (x._2, x._1))
       .toMap
     // output test
     // println(wordsTranslated.mkString("--\n"))
+
+    val reducedWords = words2
+      .map(word =>
+        (word, for (char <- word.replace(""""""","").toLowerCase()) yield charToDigit.getOrElse(char,"+"))
+      )
+      .map(x => (x._1, x._2.mkString))
+      .filter(!_._2.contains("+"))
+      .toMap
+    println("*******")
+    println(reducedWords)
+
 
     // ***---***
     // read telephone numbers

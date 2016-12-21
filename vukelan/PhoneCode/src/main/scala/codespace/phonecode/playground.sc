@@ -5,13 +5,12 @@ val numPattern = "[0-9]+".r
 val letPattern = "[a-z,A-Z]+".r
 
 // mac os
- val phonecode = Source.fromFile("/Users/johnsmith/IdeaProjects/course-exersizes/vukelan/PhoneCode/data/phonecode.txt", "UTF-8")
+// val phonecode = Source.fromFile("/Users/johnsmith/IdeaProjects/course-exersizes/vukelan/PhoneCode/data/phonecode.txt", "UTF-8")
 
-//// windows
-//val phonecode = Source.fromFile("D:\\IdeaProjects\\course-exersizes\\vukelan\\PhoneCode\\data\\phonecode.txt", "UTF-8")
+// windows
+val phonecode = Source.fromFile("D:\\IdeaProjects\\course-exersizes\\vukelan\\PhoneCode\\data\\phonecode.txt", "UTF-8")
 
 val lines = phonecode.getLines
-
 lines.map(
   x => (
     numPattern.findFirstIn(x).getOrElse(""),
