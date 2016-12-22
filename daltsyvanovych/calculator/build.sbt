@@ -1,6 +1,6 @@
 val scalaTest = "org.scalatest" %% "scalatest" % "3.0.0"
 
-name := "complex numbers"
+name := "calculator"
 
 scalaVersion := "2.12.1"
 
