@@ -2,31 +2,35 @@ package yuri.phonecode
 
 class PhonecodeEncoder(revLookup: ReverseLookup)
 {
-    def getValidEncodings(s: String): Seq[String] = {
+    def retrieveValidEncodings(s: String): Seq[String] = {
 
-      val lookup = revLookup.lookup.get
+      val lookup = revLookup.lookup
 
-      def getEncodings(s: String, allowSkip: Boolean): Seq[String] = {
+      def retrieveEncodings(s: String, allowSkip: Boolean): Seq[String] = {
 
-        def getSplitEncodings(i: Int): Seq[String] = {
+
+        def retrieveSplitEncodings(i: Int): Seq[String] = {
           val left = s.substring(0, i)
           val right = s.substring(i)
 
           lookup.get(left) match {
             case Some(lft) => {
-              val rightEncodings = getEncodings(right, true)
-              lft.flatMap(l => rightEncodings.map(r => (l + " " + r).trim))
+              val rightEncodings = retrieveEncodings(right, allowSkip = true)
+              //lft.flatMap(l => rightEncodings.map(r => (l + " " + r).trim))
+              for{l <- lft
+                  r <- rightEncodings} yield (l + " "+r).trim
             }
-
-            case _ => if (left.tail.isEmpty && allowSkip) getEncodings(right, false).map(r => (left + " " + r).trim)
+            case _ => if (left.tail.isEmpty && allowSkip)
+                            retrieveEncodings(right, allowSkip = false).map(r => (left + " " + r).trim)
             else Seq()
           }
+
         }
 
         if (s.isEmpty) Seq("")
         else {
           val (digitPart, letterPart) = (1 to s.length)
-            .flatMap(getSplitEncodings)
+            .flatMap(retrieveSplitEncodings)
             .partition(_.matches("^[0-9] .+"))
 
           if (letterPart.isEmpty) digitPart
@@ -34,6 +38,6 @@ class PhonecodeEncoder(revLookup: ReverseLookup)
         }
       }
 
-      getEncodings(s.replaceAll("[/-]", ""), true)
+      retrieveEncodings(s.replaceAll("[/-]", ""), true)
     }
 }
