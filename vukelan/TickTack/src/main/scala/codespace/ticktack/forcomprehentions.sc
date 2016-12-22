@@ -1,14 +1,38 @@
 import codespace.ticktack._
-import codespace.ticktack.Label
-import codespace.ticktack.strategies.ComputerPlayer._
 
 val (c, t, n) = (Some(CrossLabel), Some(ToeLabel), None)
+val opponentLabel = Some(ToeLabel)
 
 val data = IndexedSeq(
+  IndexedSeq(t, t, n),
   IndexedSeq(c, t, n),
-  IndexedSeq(c, t, n),
-  IndexedSeq(c, t, n)
+  IndexedSeq(c, n, n)
 )
+val trans = for (i <- 0 to 2) yield {
+  for (j <- 0 to 2) yield {
+    data(j)(i)
+  }
+}
+trans(2)(0)
+data(1)(1)
+
+def defenceRow(row: IndexedSeq[Option[Label]]): Int = {
+  row match {
+    case IndexedSeq(`opponentLabel`, `opponentLabel`, None) => 2
+    case IndexedSeq(`opponentLabel`, None, `opponentLabel`) => 1
+    case IndexedSeq(None, `opponentLabel`, `opponentLabel`) => 0
+    case _ => -1
+  }
+}
+
+val rows = for (i <- 0 to 2 if defenceRow(data(i)) != -1) yield (i, defenceRow(data(i)))
+
+rows.nonEmpty
+rows.head
+
+val cols = for (i <- 0 to 2 if defenceRow(trans(i)) != -1) yield (defenceRow(trans(i)),i)
+
+
 
 val f = ThreeRules.ThreeField(data)
 
@@ -20,9 +44,9 @@ val transponent = for (i <- 0 to 2) yield {
   }
 }
 
-def defenceRow(row: IndexedSeq[Option[Label]]): Int = {
-
-}
+//def defenceRow(row: IndexedSeq[Option[Label]]): Int = {
+//
+//}
 
 //CrossPlayer.nextStep2(f)
 

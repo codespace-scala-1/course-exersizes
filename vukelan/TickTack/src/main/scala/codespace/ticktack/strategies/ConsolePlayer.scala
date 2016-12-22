@@ -1,10 +1,8 @@
 package codespace.ticktack.strategies
 
-import codespace.ticktack.{Field, Label, Player, Rules}
+import codespace.ticktack.{Label, Rules}
 
-abstract class ConsolePlayer(label:Label,
-                    rules:Rules) extends BasePlayer(label,rules) {
-
+abstract class ConsolePlayer(label:Label,rules:Rules) extends BasePlayer(label,rules) {
 
   Console.println(s"Hi, my label is ${label}, this.label = ${this.label}")
 
