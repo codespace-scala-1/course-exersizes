@@ -5,15 +5,17 @@ import scala.util.Try
 
 class ReverseLookup(path: String) {
 
-  val lookup = Try {
+  val lookup = {
     Source
       .fromFile(path)
       .getLines
-      .map { rawLine => (rawLine.replaceAll("\"", "").flatMap(c => encodeChar(c).get), rawLine) }
-      .foldLeft(Map.empty[String, Seq[String]]) { case (acc, (k, v)) => acc.updated(k, acc.getOrElse(k, Seq.empty[String]) ++ Seq(v)) }
-  }.toOption
+      .map { rawLine => (rawLine.replaceAll("\"", "").flatMap(c => encodeChar(c)), rawLine) }
+      .foldLeft(Map.empty[String, Seq[String]]) {
+        case (acc, (k, v)) => acc.updated(k, acc.getOrElse(k, Seq.empty[String]) ++ Seq(v))
+      }
+  }
 
-  def encodeChar(c: Char): Option[String] = Try {
+  def encodeChar(c: Char): String =
     c.toLower match {
       case 'e' => "0"
       case 'j' | 'n' | 'q' => "1"
@@ -26,5 +28,5 @@ class ReverseLookup(path: String) {
       case 'l' | 'o' | 'p' => "8"
       case 'g' | 'h' | 'z' => "9"
     }
-  }.toOption
+
 }
