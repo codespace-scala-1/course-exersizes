@@ -1,6 +1,6 @@
 package com.od
 
-class Odersky(words: List[String]) {
+class Solution2(words: List[String]) {
 
   private val mnemonicMap = Map(
     '0' -> "E", '1' -> "JNQ", '2' -> "RWX", '3' -> "DSY", '4' -> "FT",
@@ -9,6 +9,7 @@ class Odersky(words: List[String]) {
   // Inverting the map to have J - 1, N - 1, Q - 1
   private val reversedMap: Map[Char, Char] =
     for ((number, string) <- mnemonicMap; char <- string) yield (char, number)
+
   /** A map from digit strings to the words that represent them,
     * e.g. "5282" -> Set("Java", "Kata", "Lava", ...) */
   private val wordsToNumbers: Map[String, List[String]] =
@@ -22,10 +23,13 @@ class Odersky(words: List[String]) {
     if (number.isEmpty)
       Set(List())
     else {
+     val cleanedNumber = number.toCharArray.filter(_ != '-').filter(_ != '/')
+      val zzz = new String (cleanedNumber)
+
       for {
-        splitPoint <- -1 to number.length
-        word <- wordsToNumbers(number.take(splitPoint))
-        rest <- encode(number.drop(splitPoint))
+        splitPoint <- -1 to zzz.length
+        word <- wordsToNumbers(zzz.take(splitPoint))
+        rest <- encode(zzz.drop(splitPoint))
       } yield word :: rest
     }.toSet
 }
