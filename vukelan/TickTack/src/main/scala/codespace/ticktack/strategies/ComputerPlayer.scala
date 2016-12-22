@@ -1,16 +1,18 @@
 package codespace.ticktack.strategies
 
-import codespace.ticktack.ThreeRules.ThreeField
 import codespace.ticktack._
+import codespace.ticktack.ThreeRules._
 
 class ComputerPlayer(label: Label, rules: Rules) extends BasePlayer(label, rules) {
 
+  def nextStep(f: Field): Either[String, ((Int, Int), Player)] = ???
+
   /*
-  method nextStep first call defence on the given field, then tries to attack
+  method nextStep2 first call defence on the given field, then tries to attack
    */
-  def nextStep(f: ThreeField): Either[String, ((Int, Int), Player)] = {
-    if (defence(f) != (-1,-1)) defence(f)
-    else attack(f)
+  def nextStep2(f: ThreeField): Either[String, (Int, Int)] = {
+    if (defence(f) != (-1, -1)) Right(defence(f))
+    else Right(attack(f))
   }
 
   // determine what is the opponent's label
@@ -28,8 +30,8 @@ class ComputerPlayer(label: Label, rules: Rules) extends BasePlayer(label, rules
   */
   def defence(f: ThreeField): (Int, Int) = {
     // helper defenceRow gives position of field that needs to be blocked
-    def defenceRow(i: IndexedSeq[Option[Label]]): Int = {
-      i match {
+    def defenceRow(row: IndexedSeq[Option[Label]]): Int = {
+      row match {
         case IndexedSeq(`opponentLabel`, `opponentLabel`, None) => 2
         case IndexedSeq(`opponentLabel`, None, `opponentLabel`) => 1
         case IndexedSeq(None, `opponentLabel`, `opponentLabel`) => 0
@@ -75,14 +77,15 @@ class ComputerPlayer(label: Label, rules: Rules) extends BasePlayer(label, rules
       }
     }
 
-    val rowsToDefence = for (i <- 0 to 2;
-                             if defenceRow(f.data(i)) != -1)
-      yield (i, defenceRow(f.data(i)))
+    val rowsToDefence =
+      for (i <- 0 to 2
+           if defenceRow(f.data(i)) != -1)
+        yield (i, defenceRow(f.data(i)))
 
     val columnsToDefens =
-      for (i <- 0 to 2;
-           column = defenceRow(transponent(i))
-           if column != -1) yield (column, i)
+      for (i <- 0 to 2
+           if defenceRow(transponent(i)) != -1)
+        yield (defenceRow(transponent(i)), i)
 
     if (rowsToDefence.nonEmpty) rowsToDefence.head
     else if (columnsToDefens.nonEmpty) columnsToDefens.head
@@ -104,9 +107,10 @@ class ComputerPlayer(label: Label, rules: Rules) extends BasePlayer(label, rules
     helper complete looks for almost ready line to make winning step
      */
     def complete(f: ThreeField): (Int, Int) = {
-      // helper defenceRow gives position of field that needs to be blocked
-      def completeRow(i: IndexedSeq[Option[Label]]): Int = {
-        i match {
+
+      // helper completeRow gives position of field that needs to be blocked
+      def completeRow(row: IndexedSeq[Option[Label]]): Int = {
+        row match {
           case IndexedSeq(`label`, `label`, None) => 2
           case IndexedSeq(`label`, None, `label`) => 1
           case IndexedSeq(None, `label`, `label`) => 0
@@ -176,10 +180,12 @@ class ComputerPlayer(label: Label, rules: Rules) extends BasePlayer(label, rules
         x - x
      */
     def makeSplit: IndexedSeq[(Int, Int)] = {
-      if (f.get(1, 1).isEmpty) (1, 1)
+      if (f.get(1, 1).isEmpty) IndexedSeq((1, 1))
       else {
-        val cornerCells = for (i <- 0 to 2 if i % 2 == 0; j <- 0 to 2 if j % 2 == 0) yield {(i, j)}
-        for (i <- cornerCells if (f.get(i).isEmpty) yield {i}
+        val cornerCells = for (i <- 0 to 2 if i % 2 == 0; j <- 0 to 2 if j % 2 == 0) yield {
+          (i, j)
+        }
+        for (i <- cornerCells if f.get(i._1, i._2).isEmpty) yield (i._1, i._2)
       }
     }
 
@@ -188,6 +194,6 @@ class ComputerPlayer(label: Label, rules: Rules) extends BasePlayer(label, rules
 
   }
 
-  override def tell(s: String) = ???
+  override def tell(s: String) = this
 
 }

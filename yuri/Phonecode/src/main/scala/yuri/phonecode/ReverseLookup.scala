@@ -3,15 +3,15 @@ package yuri.phonecode
 import scala.io.Source
 import scala.util.Try
 
-class WordsLookup(path: String) {
+class ReverseLookup(path: String) {
 
-  val source = Source.fromFile(path)
-
-  val lookup = source.getLines
-                .map { rawLine => (rawLine.replaceAll("\"", "").flatMap(c => encodeChar(c).get), rawLine) }
-                .foldLeft(Map.empty[String, Seq[String]])
-                          { case (acc, (k, v)) => acc.updated(k, acc.getOrElse(k, Seq.empty[String]) ++ Seq(v)) }
-
+  val lookup = Try {
+    Source
+      .fromFile(path)
+      .getLines
+      .map { rawLine => (rawLine.replaceAll("\"", "").flatMap(c => encodeChar(c).get), rawLine) }
+      .foldLeft(Map.empty[String, Seq[String]]) { case (acc, (k, v)) => acc.updated(k, acc.getOrElse(k, Seq.empty[String]) ++ Seq(v)) }
+  }.toOption
 
   def encodeChar(c: Char): Option[String] = Try {
     c.toLower match {

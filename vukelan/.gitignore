@@ -1,4 +1,8 @@
 *
+!./src/*.sc
+!*.t
+!*.w
+!*.txt
 !*.gitignore
 !*.md
 !*.scala

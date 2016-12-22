@@ -1,6 +1,5 @@
 package codespace.ticktack
-
-import org.scalatest._
+import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 class ThreeRulesTest extends FunSuite
   with BeforeAndAfterAll {
