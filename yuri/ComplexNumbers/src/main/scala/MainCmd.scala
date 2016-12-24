@@ -3,8 +3,8 @@ import yuri.math._
 object MainCmd {
   def main(args: Array[String]): Unit = {
 
-    val a = ComplexNumber(1, 2)
-    val b = ComplexNumber(3, 4)
+    val a: ComplexNumber[Double] = ComplexNumber(1, 2)
+    val b: ComplexNumber[Double] = ComplexNumber(3, 4)
 
     val two: ComplexNumber[Double] = 2.0
 

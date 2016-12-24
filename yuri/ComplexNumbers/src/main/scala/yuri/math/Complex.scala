@@ -1,10 +1,7 @@
 package yuri.math
 
-case class ComplexNumber[T <:  Numeric[T]](re : Double, im : Double)
+case class ComplexNumber[T](re : Double, im : Double) extends Numeric[T]
 {
-  //def re: Double
-  //def im: Double
-
   private val epsilon = 1e-14
 
   lazy val lengthSq = im*im + re*re
@@ -59,6 +56,26 @@ case class ComplexNumber[T <:  Numeric[T]](re : Double, im : Double)
     case other: ComplexNumber[T] => (this - other).lengthSq < 1e-14
     case _ => false
   }
+
+  override def plus(x: T, y: T): T = x + y
+
+  override def minus(x: T, y: T): T = x - y
+
+  override def times(x: T, y: T): T = x * y
+
+  override def negate(x: T): T = -x
+
+  override def fromInt(x: Int): T = ???
+
+  override def toInt(x: T): Int = ???
+
+  override def toLong(x: T): Long = ???
+
+  override def toFloat(x: T): Float = ???
+
+  override def toDouble(x: T): Double = ???
+
+  override def compare(x: T, y: T): Int = ???
 }
 
 //case class Complex(re : Double, im : Double) extends ComplexNumber
