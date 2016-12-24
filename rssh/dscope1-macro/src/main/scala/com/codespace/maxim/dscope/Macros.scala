@@ -15,26 +15,23 @@ object Macros {
     //    .replaceAll("dscope.this.`package`.", "")
     val transformer = new Transformer() {
          
-          override def transform(tree:Tree):Tree =
-           tree match {
-             //case q"$f($arg1)($arg2)" => 
-             //           System.err.println(s"f=$f")
-             //           f match {
-                          case q"$com.codespace.maxim.dscope.`package`.scope" =>
-                                  q"implicitly[com.codespace.maxim.dscope.scope]"
-             //                     q"implicitly[com.codespace.maxim.dscope.scope]($argss)"
-             //             case _ => super.transform(tree)
-             //           }
-             case _ => super.transform(tree)
-           }
+          override def transform(tree:Tree):Tree = {
+            System.err.println(s"MACRO:transform tree: ${tree}")
+            tree match {
+              case q"$f(...$argss)" =>
+                System.err.println(s"f=$f  argss=$argss")
+                f match {
+                  case q"dscope.this.`package`.scope" => q"scope1(...$argss)"
+                  case _ => super.transform(tree)
+                }
+              case _ => super.transform(tree)
+            }
+          }
 
     }
 
     val newTree = q"""ScopeContext() { 
-                     scope1:com.codespace.maxim.dscope.scope => {
-                         implicit val scope2=scope1 
-                         ${transformer.transform(block.tree)} 
-                       }
+                     scope1 => ${transformer.transform(block.tree)}
                      }
                    """
     println("MACRO:contextImpl:"+show(newTree))
