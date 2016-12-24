@@ -32,6 +32,8 @@ lazy val dscopeMacro1  = (project in file("dscope1-macro")).
     libraryDependencies += scalaVersion("org.scala-lang" % "scala-reflect" % _ ).value
    )
 
+
+
 lazy val root = (project in file(".")).
   aggregate(calculator, life, dscopeMacro1)
 
