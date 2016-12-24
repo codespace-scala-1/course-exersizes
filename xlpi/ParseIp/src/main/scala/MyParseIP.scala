@@ -1,6 +1,13 @@
 import scala.collection.mutable.ArrayBuffer
 
-// parse IP: String to Array[Byte]
+/** parse IP: String to Array[Byte]
+* requirements: - Input String: "2.112.10.234"
+*   OutPut: Array[Byte] = {2,112,10,234}
+  *   1. TODO how write 234 in type Byte? - organise using MyParse class,
+  *     that allow convert -22 (234) to 234 in process getting value Array[Int]
+  *   2. TDD in developed - TODO write test (by requirements and step by step relize implimentation
+  */
+
 object MyParser {
 /*
   case class parseIp(inputString: String)   // TODO returned
