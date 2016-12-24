@@ -6,13 +6,14 @@ class DScopeTest extends FunSuite
 {
 
   test("call exit on normal endinf") {
-   Context {
+   Context { 
       print("Hello")
       scope(exit) {
         println("exit")
       }
       println(" World")
-      scope(success){ println("Ok")}
+      scope(success){ println("Ok")
+      }
     }
   }
 
