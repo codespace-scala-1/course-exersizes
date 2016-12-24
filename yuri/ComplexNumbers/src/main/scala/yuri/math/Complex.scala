@@ -1,11 +1,14 @@
 package yuri.math
 
-case class ComplexNumber[T](re : T, im : T) extends Fractional[ComplexNumber[T]]
+case class ComplexNumber[T:Fractional](re : T, im : T) extends Fractional[ComplexNumber[T]]
 {
   private val epsilon = 1e-14
 
-  lazy val lengthSq = im*im + re*re
-  lazy val length = math.sqrt(lengthSq)
+  val tNum = implicitly[Fractional[T]]
+  implicit def withOps(t:T):tNum.Ops = new tNum.Ops(t)
+
+  lazy val lengthSq =  tNum.times(im,im) + re*re
+  lazy val length = math.sqrt(lengthSq.toDouble())
 
   def +(other: ComplexNumber[T]): ComplexNumber[T] = ComplexNumber(this.re + other.re, this.im + other.im)
 

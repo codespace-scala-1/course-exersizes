@@ -10,6 +10,12 @@ object Macros {
   def contextImpl(c: Context)(block: c.Expr[Any]): c.Expr[Unit] = {
     import c.universe._
 
+    val scName = TermName(c.freshName("scope"))
+
+    val scParam = q"val $scName = _"
+    val sc = q"$scName"]
+
+
     //block.tree
     //    .toString()
     //    .replaceAll("dscope.this.`package`.", "")
@@ -18,10 +24,10 @@ object Macros {
           override def transform(tree:Tree):Tree = {
             System.err.println(s"MACRO:transform tree: ${tree}")
             tree match {
-              case q"$f(...$argss)" =>
-                System.err.println(s"f=$f  argss=$argss")
+              case q"$f($x)($y)" =>
+                System.err.println(s"f=$f  x=$x y=$y")
                 f match {
-                  case q"dscope.this.`package`.scope" => q"scope1(...$argss)"
+                  case q"dscope.this.`package`.scope" => q"$sc($x)($y)"
                   case _ => super.transform(tree)
                 }
               case _ => super.transform(tree)
@@ -31,7 +37,7 @@ object Macros {
     }
 
     val newTree = q"""ScopeContext() { 
-                     scope1 => ${transformer.transform(block.tree)}
+                     $scParam => ${transformer.transform(block.tree)}
                      }
                    """
     println("MACRO:contextImpl:"+show(newTree))
