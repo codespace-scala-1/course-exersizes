@@ -1,17 +1,20 @@
 package yuri.math
 
-case class ComplexNumber[T](re : Double, im : Double) extends Numeric[T]
+case class ComplexNumber[T:Fractional](re : T, im : T) extends Fractional[ComplexNumber[T]]
 {
   private val epsilon = 1e-14
 
-  lazy val lengthSq = im*im + re*re
-  lazy val length = math.sqrt(lengthSq)
+  val tNum = implicitly[Fractional[T]]
+  implicit def withOps(t:T):tNum.Ops = new tNum.Ops(t)
 
-  def +(other: ComplexNumber[T]) = ComplexNumber(this.re + other.re, this.im + other.im)
+  lazy val lengthSq =  tNum.times(im,im) + re*re
+  lazy val length = math.sqrt(lengthSq.toDouble())
 
-  def -(other: ComplexNumber[T]) = ComplexNumber(this.re - other.re, this.im - other.im)
+  def +(other: ComplexNumber[T]): ComplexNumber[T] = ComplexNumber(this.re + other.re, this.im + other.im)
 
-  def unary_- = ComplexNumber(-this.re, -this.im)
+  def -(other: ComplexNumber[T]): ComplexNumber[T] = ComplexNumber(this.re - other.re, this.im - other.im)
+
+  def unary_- : ComplexNumber[T] = ComplexNumber(-this.re, -this.im)
 
   def unary_+ = this
 
@@ -57,25 +60,33 @@ case class ComplexNumber[T](re : Double, im : Double) extends Numeric[T]
     case _ => false
   }
 
-  override def plus(x: T, y: T): T = x + y
+  override def plus(x: ComplexNumber[T], y: ComplexNumber[T]): ComplexNumber[T] = x + y
 
-  override def minus(x: T, y: T): T = x - y
+  override def minus(x: ComplexNumber[T], y: ComplexNumber[T]): ComplexNumber[T] = x - y
 
-  override def times(x: T, y: T): T = x * y
+  override def times(x: ComplexNumber[T], y: ComplexNumber[T]): ComplexNumber[T] = x * y
 
-  override def negate(x: T): T = -x
+  override def negate(x: ComplexNumber[T]): ComplexNumber[T] = -x
 
-  override def fromInt(x: Int): T = ???
+  override def fromInt(x: Int): ComplexNumber[T] = ???
 
-  override def toInt(x: T): Int = ???
+  override def toInt(x: ComplexNumber[T]): Int = ???
 
-  override def toLong(x: T): Long = ???
+  override def toLong(x: ComplexNumber[T]): Long = ???
 
-  override def toFloat(x: T): Float = ???
+  override def toFloat(x: ComplexNumber[T]): Float = {
+    require(math.abs(x.im) < epsilon)
+    x.re.toFloat
+  }
 
-  override def toDouble(x: T): Double = ???
+  override def toDouble(x: ComplexNumber[T]): Double = {
+    require(math.abs(x.im) < epsilon)
+    x.re.toDouble
+  }
 
-  override def compare(x: T, y: T): Int = ???
+  override def compare(x: ComplexNumber[T], y: ComplexNumber[T]): Int = ???
+
+  override def div(x: ComplexNumber[T], y: ComplexNumber[T]): ComplexNumber[T] = x / y
 }
 
 //case class Complex(re : Double, im : Double) extends ComplexNumber

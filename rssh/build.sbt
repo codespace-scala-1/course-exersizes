@@ -3,6 +3,10 @@ import Dependencies._
 lazy val commonSettings = Seq(
   organization := "com.example",
   scalaVersion := "2.12.1",
+  scalacOptions ++= Seq("-unchecked","-deprecation", "-feature"
+                         /* ,  "-Ymacro-debug-lite"  */
+                         ,   "-Ydebug" /* ,  "-Ylog:lambdalift"  */
+                     ),
   libraryDependencies += scalaTest % Test
 )
 
@@ -27,6 +31,8 @@ lazy val dscopeMacro1  = (project in file("dscope1-macro")).
     name := "dscope1-macro",
     libraryDependencies += scalaVersion("org.scala-lang" % "scala-reflect" % _ ).value
    )
+
+
 
 lazy val root = (project in file(".")).
   aggregate(calculator, life, dscopeMacro1)

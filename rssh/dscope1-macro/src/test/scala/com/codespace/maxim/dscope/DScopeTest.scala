@@ -12,7 +12,9 @@ class DScopeTest extends FunSuite
         println("exit")
       }
       println(" World")
-      scope(success){ println("Ok")}
+      scope(success){ 
+       println("Ok")
+      }
     }
   }
 
