@@ -1,46 +1,41 @@
 package yuri.math
 
-abstract class ComplexNumber
+case class ComplexNumber[T](re : Double, im : Double) extends Numeric[T]
 {
-  def re: Double
-  def im: Double
+  private val epsilon = 1e-14
 
-  def +(other: Complex) = Complex(this.re + other.re, this.im + other.im)
+  lazy val lengthSq = im*im + re*re
+  lazy val length = math.sqrt(lengthSq)
 
-  def -(other: ComplexNumber) = Complex(this.re - other.re, this.im - other.im)
+  def +(other: ComplexNumber[T]) = ComplexNumber(this.re + other.re, this.im + other.im)
 
-  def unary_- = Complex(-this.re, -this.im)
+  def -(other: ComplexNumber[T]) = ComplexNumber(this.re - other.re, this.im - other.im)
+
+  def unary_- = ComplexNumber(-this.re, -this.im)
 
   def unary_+ = this
 
-  def conj() = Complex(this.re, -this.im)
+  def conj() = ComplexNumber[T](this.re, -this.im)
 
   def unary_~ = conj()
 
-  def lengthSq() = im*im + re*re
+  def *(other: ComplexNumber[T]) =
+    ComplexNumber[T](this.re*other.re - this.im*other.im, this.re*other.im + this.im*other.re)
 
-  def length() = math.sqrt(lengthSq)
-
-  def *(other: Complex) =
-    Complex(this.re*other.re - this.im*other.im, this.re*other.im + this.im*other.re)
-
-  def /(d: Double):Option[Complex] =
-    if(d > 0) Some(Complex(this.re / d, this.im / d))
-    else None
-
-  def /(other: ComplexNumber): Option[Complex] =
-  {
-    other match {
-      case ComplexZero => None
-      case _ => Some(this * (~other / other.lengthSq).get)
-    }
+  def /(d: Double): ComplexNumber[T] = {
+    require(math.abs(d) > epsilon)
+    ComplexNumber(this.re / d, this.im / d)
   }
 
-  def reciprocal(): Option[Complex] = {
-    this match {
-      case ComplexZero => None
-      case _ => ~this / lengthSq
-    }
+  def /(other: ComplexNumber[T]): ComplexNumber[T] =
+  {
+    require(other.length > epsilon)
+    this * (~other / other.lengthSq)
+  }
+
+  def reciprocal(): ComplexNumber[T] = {
+    require(length > epsilon)
+    ~this / lengthSq
   }
 
   override def toString = {
@@ -58,14 +53,34 @@ abstract class ComplexNumber
   }
 
   override def equals(o: Any) = o match {
-    case other: ComplexNumber => (this - other).lengthSq < 1e-14
+    case other: ComplexNumber[T] => (this - other).lengthSq < 1e-14
     case _ => false
   }
+
+  override def plus(x: T, y: T): T = x + y
+
+  override def minus(x: T, y: T): T = x - y
+
+  override def times(x: T, y: T): T = x * y
+
+  override def negate(x: T): T = -x
+
+  override def fromInt(x: Int): T = ???
+
+  override def toInt(x: T): Int = ???
+
+  override def toLong(x: T): Long = ???
+
+  override def toFloat(x: T): Float = ???
+
+  override def toDouble(x: T): Double = ???
+
+  override def compare(x: T, y: T): Int = ???
 }
 
-case class Complex(re : Double, im : Double) extends ComplexNumber
+//case class Complex(re : Double, im : Double) extends ComplexNumber
 
-case object ComplexZero extends ComplexNumber {
-  override def re: Double = 0.0
-  override def im: Double = 0.0
-}
+//case object ComplexZero extends ComplexNumber {
+//  override def re: Double = 0.0
+//  override def im: Double = 0.0
+//}

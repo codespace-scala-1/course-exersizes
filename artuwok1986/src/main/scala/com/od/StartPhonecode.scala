@@ -4,11 +4,11 @@ object StartPhonecode {
 
   def main(args: Array[String]): Unit = {
 
-    val testW: String = "/mnt/01D0AD212457E350/Programming/_scala/scala_projects" +
-      "/codespace/course-exersizes/artuwok1986/src/main/scala/com/od/test.w"
+    val rootDir = args(0)
 
-    val testT: String = "/mnt/01D0AD212457E350/Programming/_scala/scala_projects" +
-      "/codespace/course-exersizes/artuwok1986/src/main/scala/com/od/test.t"
+    val testW: String =  rootDir + "/src/main/scala/com/od/test.w"
+
+    val testT: String = rootDir + "src/main/scala/com/od/test.t"
 
     val fileWords = io.Source.fromFile(testW).getLines.toList
     fileWords.foreach(println)

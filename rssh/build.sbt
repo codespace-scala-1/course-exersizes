@@ -10,7 +10,8 @@ lazy val commonSettings = Seq(
 lazy val calculator  = (project in file("calculator")).
   settings(commonSettings: _*).
   settings(
-    name := "Calculator"
+    name := "Calculator",
+    libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"
   )
 
 
@@ -20,6 +21,13 @@ lazy val life  = (project in file("life")).
     name := "Life"
    )
 
+lazy val dscopeMacro1  = (project in file("dscope1-macro")).
+   settings(commonSettings: _*).
+   settings(
+    name := "dscope1-macro",
+    libraryDependencies += scalaVersion("org.scala-lang" % "scala-reflect" % _ ).value
+   )
+
 lazy val root = (project in file(".")).
-  aggregate(calculator, life)
+  aggregate(calculator, life, dscopeMacro1)
 
