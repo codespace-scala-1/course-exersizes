@@ -29,7 +29,8 @@ class LifeField(var data: Array[Array[CellState]]) {
 
   def next(): Either[String, LifeField] = {
 
-    val nextData: Array[Array[CellState]] = Array.tabulate[CellState](ny, nx) { (i,j) => data(i)(j) }
+    val nextData: Array[Array[CellState]] =
+        Array.tabulate[CellState](ny, nx) { (i,j) => data(i)(j) }
 
     for(i <- 0 until ny; j <- 0 until nx) {
       val n = getAliveNeighbours(i, j)
