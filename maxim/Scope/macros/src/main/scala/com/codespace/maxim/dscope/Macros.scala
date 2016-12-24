@@ -3,20 +3,24 @@ package com.codespace.maxim.scope
 import scala.reflect.macros.blackbox.Context
 
 /**
-  * Created by Admin on 15.12.2016.
+  * Created Maxim Sambulat
   */
 
 object Macros {
   def contextImpl(c: Context)(block: c.Expr[Any]): c.Expr[Unit] = {
     import c.universe._
 
-    val blockCode =
-      block.tree
-        .toString()
-        .replaceAll("dscope.this.`package`.", "")
+    val oldBlockCode = showCode(block.tree)
+    println("=============================== Old Code ===============================")
+    println(oldBlockCode)
 
-    val newTree = c.parse("ScopeContext() { scope => " + blockCode + "}")
-    println(show(newTree))
+    val newBlockCode = oldBlockCode.replaceAll("com.codespace.maxim.dscope.`package`.", "")
+    println("=============================== Cleared Code ===============================")
+    println(newBlockCode)
+
+    val newTree = c.parse(s"ScopeContext() { scope => $newBlockCode }")
+    println("=============================== New Code ===============================")
+    println(showCode(newTree))
 
     c.Expr[Unit](q" $newTree")
   }

@@ -3,10 +3,10 @@ import yuri.math._
 object MainCmd {
   def main(args: Array[String]): Unit = {
 
-    val a = Complex(1, 2)
-    val b = Complex(3, 4)
+    val a: ComplexNumber[Double] = ComplexNumber(1, 2)
+    val b: ComplexNumber[Double] = ComplexNumber(3, 4)
 
-    val two: Complex = 2.0
+    val two: ComplexNumber[Double] = 2.0
 
     val prod = a * b / two
 
@@ -16,8 +16,8 @@ object MainCmd {
     println(two)
     println(a / b)
 
-    val aa: Complex = Complex(1, 2)
-    println(aa / ComplexZero)
+    val aa = ComplexNumber(1, 2)
+    println(aa / ComplexNumber(0, 0))
 
   }
 }
