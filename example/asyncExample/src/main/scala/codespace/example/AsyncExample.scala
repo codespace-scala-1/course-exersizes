@@ -22,12 +22,14 @@ object AsyncExample {
       await(f)
       Console.println("after f")
 
+      /*
       try {
-        await(f)
+       // not work here await(f)
         throw new RuntimeException("BE-be-be")
       }finally{
         Console.println("catched exeception")
       }
+      */
 
     }
     Console.println("f1 receieve")
