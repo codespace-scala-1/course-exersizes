@@ -15,6 +15,7 @@ object VotingExample {
     }
   }
 
+
   def ifVote[T](nodes:List[String],ifTrue: =>T,ifFalse: =>T):Future[T] =
   {
     val listVoteFutures: List[Future[Boolean]] = nodes.map(vote(_))
