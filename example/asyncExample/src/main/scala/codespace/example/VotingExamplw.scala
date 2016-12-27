@@ -30,16 +30,18 @@ object VotingExample {
 
   def ifVoteLimited[T](nodes:List[String],ifTrue: =>T,ifFalse: =>T):Future[T] =
   {
-
+    val listVoteFutures: List[Future[Boolean]] = nodes.map(vote(_))
+    afterOneSecond().map{ _ =>
+       ???
+    }
   }
+
+  val scheduledThreadPool = Executors.newScheduledThreadPool(1)
 
   def afterOneSecond(): Future[Unit] =
   {
-    val exec = Executors.newScheduledThreadPool(1)
-
     val result = Promise[Unit]
-
-    exec.schedule(
+    scheduledThreadPool.schedule(
       new Runnable {
         override def run() = {
           result success ()
@@ -47,8 +49,7 @@ object VotingExample {
       },
       1,
       TimeUnit.SECONDS)
-
-    result
+    result.future
   }
 
 
