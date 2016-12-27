@@ -13,7 +13,7 @@ object MainCmd {
 
     for (testLine <- sourceT.getLines()) {
 
-      val encodings = encoder.getValidEncodings(testLine)
+      val encodings = encoder.retriveValidEncodings(testLine)
 
       for (enc <- encodings)
         println(s"$testLine: $enc")

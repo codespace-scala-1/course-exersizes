@@ -2,7 +2,7 @@ package codespace
 
 import scala.annotation.tailrec
 
-object CatIntro {
+object  CatIntro {
 
 
   //  A => B
