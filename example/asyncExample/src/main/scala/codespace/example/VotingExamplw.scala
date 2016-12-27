@@ -2,8 +2,11 @@ package codespace.example
 
 import java.util.concurrent.{Executors, TimeUnit}
 
+import com.sun.net.httpserver.Authenticator.Success
+
 import scala.concurrent.{Future, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Success, Try}
 
 
 object VotingExample {
@@ -30,16 +33,20 @@ object VotingExample {
 
   def ifVoteLimited[T](nodes:List[String],ifTrue: =>T,ifFalse: =>T):Future[T] =
   {
-
+    val listVoteFutures: List[Future[Boolean]] = nodes.map(vote(_))
+    afterOneSecond().map{ _ =>
+       val completedVotes: List[Try[Boolean]] = listVoteFutures.filter(_.isCompleted).map(_.value.get).filter(_.isSuccess)
+       val (truers,falses) = completedVotes.map{case Success(x) => x}.partition(identity)
+       if (truers.size >= falses.size ) ifTrue else ifFalse
+    }
   }
+
+  val scheduledThreadPool = Executors.newScheduledThreadPool(1)
 
   def afterOneSecond(): Future[Unit] =
   {
-    val exec = Executors.newScheduledThreadPool(1)
-
     val result = Promise[Unit]
-
-    exec.schedule(
+    scheduledThreadPool.schedule(
       new Runnable {
         override def run() = {
           result success ()
@@ -47,8 +54,7 @@ object VotingExample {
       },
       1,
       TimeUnit.SECONDS)
-
-    result
+    result.future
   }
 
 
