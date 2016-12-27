@@ -2,8 +2,11 @@ package codespace.example
 
 import java.util.concurrent.{Executors, TimeUnit}
 
+import com.sun.net.httpserver.Authenticator.Success
+
 import scala.concurrent.{Future, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Success, Try}
 
 
 object VotingExample {
@@ -32,7 +35,9 @@ object VotingExample {
   {
     val listVoteFutures: List[Future[Boolean]] = nodes.map(vote(_))
     afterOneSecond().map{ _ =>
-       ???
+       val completedVotes: List[Try[Boolean]] = listVoteFutures.filter(_.isCompleted).map(_.value.get).filter(_.isSuccess)
+       val (truers,falses) = completedVotes.map{case Success(x) => x}.partition(identity)
+       if (truers.size >= falses.size ) ifTrue else ifFalse
     }
   }
 
