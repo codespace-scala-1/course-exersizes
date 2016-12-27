@@ -12,8 +12,9 @@ object Macros {
 
     val scName = TermName(c.freshName("scope"))
 
-    val scParam = q"val $scName = _"
-    val sc = q"$scName"]
+    //val scParam = q"val $scName"
+    val sc = q"$scName"
+    val scl = List(sc)
 
 
     //block.tree
@@ -37,7 +38,7 @@ object Macros {
     }
 
     val newTree = q"""ScopeContext() { 
-                     $scParam => ${transformer.transform(block.tree)}
+                     (..$scl) => ${transformer.transform(block.tree)}
                      }
                    """
     println("MACRO:contextImpl:"+show(newTree))

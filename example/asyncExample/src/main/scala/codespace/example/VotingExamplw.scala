@@ -1,6 +1,8 @@
 package codespace.example
 
-import scala.concurrent.Future
+import java.util.concurrent.{Executors, TimeUnit}
+
+import scala.concurrent.{Future, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
@@ -26,15 +28,41 @@ object VotingExample {
     }
   }
 
+  def ifVoteLimited[T](nodes:List[String],ifTrue: =>T,ifFalse: =>T):Future[T] =
+  {
+
+  }
+
+  def afterOneSecond(): Future[Unit] =
+  {
+    val exec = Executors.newScheduledThreadPool(1)
+
+    val result = Promise[Unit]
+
+    exec.schedule(
+      new Runnable {
+        override def run() = {
+          result success ()
+        }
+      },
+      1,
+      TimeUnit.SECONDS)
+
+    result
+  }
+
+
   def ifVote3[T](node1:String,node2:String,node3:String,ifTrue: =>T,ifFalse: =>T):Future[T] =
   {
     ???
+    val p = Promise[Int]()
   }
+
 
   def howToUser(): Unit =
   {
-
-    ifVote(List("A","B","C"), "YES", "NO" )
+    var r = 0
+    ifVote(List("A","B","C"), { r=1; "YES"} , { r=2; "NO" } )
   }
 
 
