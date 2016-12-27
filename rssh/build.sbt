@@ -5,7 +5,7 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.12.1",
   scalacOptions ++= Seq("-unchecked","-deprecation", "-feature"
                          /* ,  "-Ymacro-debug-lite"  */
-                         ,   "-Ydebug" /* ,  "-Ylog:lambdalift"  */
+                         /*,   "-Ydebug"  ,  "-Ylog:lambdalift"  */
                      ),
   libraryDependencies += scalaTest % Test
 )
