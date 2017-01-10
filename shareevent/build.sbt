@@ -7,7 +7,8 @@ lazy val commonSettings = Seq(
                          /* ,  "-Ymacro-debug-lite"  */
                          /*,   "-Ydebug"  ,  "-Ylog:lambdalift"  */
                      ),
-  libraryDependencies += scalaTest % Test
+  libraryDependencies += scalaTest % Test,
+  libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.16.0"
 )
 
 
