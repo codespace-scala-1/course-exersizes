@@ -13,7 +13,7 @@ class SPerson
 
 class SOrganizer extends  SPerson
 
-class Interpreter extends DomainInterpeter {
+abstract class Interpreter extends DomainInterpeter {
 
   override type Event = SEvent
   override type Location = SLocation
@@ -21,7 +21,6 @@ class Interpreter extends DomainInterpeter {
   override type Participant = SPerson
   override type Organizer = SOrganizer
 
-  override def createEvent(organizer: Organizer, title: String, theme: String, organizerCost: BigDecimal, startSchedule: DateTime, endSchedule: DateTime): Try[Event] = ???
 
 
 }
