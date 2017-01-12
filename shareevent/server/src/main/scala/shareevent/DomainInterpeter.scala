@@ -7,12 +7,11 @@ import scala.concurrent.duration.Duration
 import scala.util.Try
 
 //TODO:
-// Missing operation: from event to sequence of sheduled item.
+// Missing operation: from event to sequence of scheduled item.
 //  (set of location ?)
-// Missions operation: is particpant agree with sheduled item
+// Missions operation: does participant agree with scheduled item
 // Missing operation: how we select participants for event.
 trait DomainInterpeter {
-
   type Event
 
   type Location
@@ -49,14 +48,14 @@ trait DomainInterpeter {
 
 
   /**
-    * If participant is interest in event, then it can participate
+    * If participant is interested in event, he can participate
     * in scheduling of one.
     */
-  def participantInterest(event:Event,participant: Participant):Boolean
+  def participantInterest(event:Event, participant: Participant): Boolean
 
   def schedule(event: Event, location: Location, time: DateTime, cost: Money): Try[ScheduleItem]
 
-  def locationConfirm(scheduleItem: ScheduleItem):ScheduleItem
+  def locationConfirm(scheduleItem: ScheduleItem): ScheduleItem
 
   def generalConfirm(scheduleItem: ScheduleItem): Confirmation
 
