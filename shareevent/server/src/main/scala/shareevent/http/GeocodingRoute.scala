@@ -15,7 +15,8 @@ import akka.stream.{ActorMaterializer, Materializer}
 import akka.util.ByteString
 //import grizzled.slf4j.Logging
 import org.json4s.JsonAST._
-import org.json4s.jackson.JsonMethods._
+import org.json4s.native.JsonMethods._
+import de.heikoseeberger.akkahttpjson4s.Json4sSupport
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -25,23 +26,7 @@ import scala.util.{Failure, Success}
 
 class ServerRoute(implicit actorSystem: ActorSystem,
                      materializer: Materializer,
-                     execCtx: ExecutionContext,
-                     val validationContext: ValidationContext) extends JsonSupport {
-
-  lazy val authCode = ConfigFactory.load().getString("geocoder.ca.authenticationCode")
-  val geocoderCaUri1: Uri = "http://geocoder.ca" //TODO: switch to backup server (backup-geocoder.ca) if this fails
-  implicit val optStringParser: JsonParser[Option[String]] = GCAOptionalStringParser()
-  val stdAddressParser = JsonParser[StandardAddress]
-  val coordsParser = JsonParser[Coordinates]
-  val errorParser = JsonParser[Error]
-  /*implicit val succWriter = JsonWriter[SuccessResponse]
-  implicit val errWriter = JsonWriter[ErrorResponse]
-  implicit val stdResponseWriter = JsonWriter[StandardResponse]*/
-
-  implicit def stringStreamMarshaller(implicit ec: ExecutionContext): ToResponseMarshaller[Source[String, Unit]] =
-    Marshaller.withFixedContentType(ContentTypes.`text/plain(UTF-8)`) { s =>
-      HttpResponse(entity = HttpEntity.CloseDelimited(ContentTypes.`text/plain(UTF-8)`, s.map(ByteString(_))))
-    }
+                     execCtx: ExecutionContext) extends Json4sSupport {
 
   val testAuthenticator: Option[BasicHttpCredentials] => Future[AuthenticationResult[Unit]] =
     userPass => {
@@ -52,51 +37,6 @@ class ServerRoute(implicit actorSystem: ActorSystem,
       }
       Future.successful(authResult)
     }
-
-  def transformResponse(r: HttpResponse): Future[StandardResponse] =
-    r.entity.toStrict(1.second) map { entity =>
-      val sJson = entity.data.decodeString("UTF-8")
-      val json = parse(sJson)
-      implicit val vCtx = HeadContext("parsing geocoder.ca response")
-
-      val dStdResponse = for {
-        stdAddr <- stdAddressParser.parse(json \ "standard")("standard address").toXor
-        coords <- coordsParser.parse(json)("coordinates").toXor
-      } yield {
-        val maybeCountry = json.findField{
-          case JField("country", _) => true
-          case _ => false
-        }.map{case (_, countryJson) => countryJson.values.toString}
-        SuccessResponse(Some(stdAddr.toAddress.copy(country = maybeCountry)), coords.latt, coords.longt, None)
-      }
-      // todo yar - sort out
-      /*
-      dStdResponse.toValidated
-        .findSuccess(errorParser.parse(json \ "error")("error").map(_.toErrorResponse))
-        .valueOr(nel => ErrorResponse(None, nel.toString.replace("\n", "\n ")))
-        //\n is not supported in JSON, so just making the string a little more readable until it is treated by frontend
-        */
-      // takes the error from the input and creates an error response
-      def validErrorResponse: ValidatedER[StandardResponse] =
-        errorParser.parse(json \ "error").map(_.toErrorResponse)
-
-      val response: StandardResponse = findValid(dStdResponse.toValidated, validErrorResponse) match {
-        case Valid(ok) => ok
-        case Invalid(nel) => ErrorResponse(None, nel.toString.replace("\n", "\n "))
-      }
-      response
-    }
-
-  
-  def GeocodeRequest(address: String): HttpRequest =
-    HttpRequest(uri = geocoderCaUri1.withQuery(Query(
-      "auth" -> authCode,
-      "locate" -> address,
-      "standard" -> "1", //whether to return the properly formatted "standardized" address in the response.
-      "json" -> "1",
-      "showcountry" -> "1", //let us have country in response
-      "geoit" -> "xml" //output format. Said to be mandatory even if using json
-    )))
 
   val route =
     (get & parameter('address.as[String])) { address =>
