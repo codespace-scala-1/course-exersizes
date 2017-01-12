@@ -11,10 +11,15 @@ lazy val commonSettings = Seq(
   libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.16.0"
 )
 
+val akkaVersion = "2.4.16"
 
 lazy val commons = (project in file("commons")).settings(commonSettings: _*)
 
-lazy val server = (project in file("server")).settings(commonSettings: _*)
+lazy val server = (project in file("server"))
+  .settings(commonSettings: _*)
+  .settings(
+    libraryDependencies ++= Seq("com.typesafe.akka" %% "akka-http-experimental" % akkaVersion)
+  )
 
 lazy val clientParticipant = (project in file("client-participant")).settings(commonSettings: _*)
 

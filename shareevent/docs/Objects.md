@@ -2,7 +2,7 @@
 
  Objects:
      Event:
-      -passoive
+      -passive
       -created by Organizer
       - have title, theme
       - must be scheduled in time with duration
