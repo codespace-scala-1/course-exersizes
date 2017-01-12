@@ -12,13 +12,19 @@ lazy val commonSettings = Seq(
 )
 
 val akkaVersion = "2.4.16"
+val akkaHttpVersion = "10.0.1"
 
 lazy val commons = (project in file("commons")).settings(commonSettings: _*)
 
 lazy val server = (project in file("server"))
   .settings(commonSettings: _*)
   .settings(
-    libraryDependencies ++= Seq("com.typesafe.akka" %% "akka-http-experimental" % akkaVersion)
+    resolvers += Resolver.bintrayRepo("hseeberger", "maven"),
+    libraryDependencies ++= Seq(
+      "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
+      "org.json4s" %% "json4s-native" % "3.5.0",
+      "de.heikoseeberger" %% "akka-http-json4s" % "1.11.0"
+    )
   )
 
 lazy val clientParticipant = (project in file("client-participant")).settings(commonSettings: _*)
