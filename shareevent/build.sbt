@@ -3,10 +3,7 @@ import Dependencies._
 lazy val commonSettings = Seq(
   organization := "com.example",
   scalaVersion := "2.12.1",
-  scalacOptions ++= Seq("-unchecked","-deprecation", "-feature"
-                         /* ,  "-Ymacro-debug-lite"  */
-                         /*,   "-Ydebug"  ,  "-Ylog:lambdalift"  */
-                     ),
+  scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
   libraryDependencies += scalaTest % Test,
   libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.16.0"
 )
@@ -32,5 +29,5 @@ lazy val clientParticipant = (project in file("client-participant")).settings(co
 lazy val clientOrganizer = (project in file("client-organizer")).settings(commonSettings: _*)
 
 lazy val root = (project in file(".")).
-  aggregate(commons,server,clientParticipant,clientOrganizer)
+  aggregate(commons, server, clientParticipant, clientOrganizer)
 
