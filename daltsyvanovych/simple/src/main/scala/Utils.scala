@@ -1,10 +1,8 @@
 import scala.util.Try
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 object Utils {
 
-def parseInt(s: String) = Try(s.toInt).toOption
+  def parseInt(s: String) = Try(s.toInt).toOption
 
   def parseIp(ip: String) = {
     Try(ip.split('.').ensuring(_.length == 4)
@@ -13,7 +11,7 @@ def parseInt(s: String) = Try(s.toInt).toOption
       .map { case (x, y) => x * y }
       .sum).toOption
   }
- 
+
   def parseEthernetAddress(s: String) = ???
 
 }
