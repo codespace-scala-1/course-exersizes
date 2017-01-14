@@ -1,10 +1,11 @@
 package shareevent.simplemodel
 
 import org.joda.time.DateTime
-import shareevent.DomainInterpeter
+import org.joda.time.{Duration=>JodaDuration}
+import shareevent.{DomainInterpeter, DomainRepository}
 import shareevent.model.{Coordinate, EventStatus}
 
-import scala.concurrent.duration.Duration
+
 import scala.util.Try
 
 class SEvent
@@ -45,29 +46,31 @@ class Interpreter extends DomainInterpeter {
   override type Organizer = SOrganizer
   override type Money = BigDecimal
 
-  override def createEvent(organizer: SOrganizer, title: String, theme: String, organizerCost: Money, duration: Duration, startPossibleSchedule: DateTime, endPossibleSchedule: DateTime): Try[SEvent] = ???
+  implicit val moneyNumeric = implicitly[Numeric[BigDecimal]]
 
-  override def createLocation(capacity: Int, startSchedule: DateTime, endSchedule: DateTime, coordination: Coordinate, costs: Money): Try[SLocation] = ???
+  override def createEvent(organizer: SOrganizer, title: String, theme: String, organizerCost: Money, duration: JodaDuration, startPossibleSchedule: DateTime, endPossibleSchedule: DateTime): DomainRepository[SParticipant] => Try[SEvent] = ???
+
+  override def createLocation(capacity: Int, startSchedule: DateTime, endSchedule: DateTime, coordination: Coordinate, costs: Money): DomainRepository[SParticipant] => Try[SLocation] = ???
 
   /**
     * If participant is interested in event, he can participate
     * in scheduling of one.
     */
-  override def participantInterest(event: SEvent, participant: SParticipant): Boolean = ???
+  override def participantInterest(event: SEvent, participant: SParticipant): DomainRepository[SParticipant] => Boolean = ???
 
-  override def schedule(event: SEvent, location: SLocation, time: DateTime, cost: Money): Try[ScheduleItem] = ???
+  override def schedule(event: SEvent, location: SLocation, time: DateTime, cost: Money):DomainRepository[SParticipant] => Try[ScheduleItem] = ???
 
-  override def locationConfirm(scheduleItem: ScheduleItem): ScheduleItem = ???
+  override def locationConfirm(scheduleItem: ScheduleItem): DomainRepository[SParticipant] => Try[ScheduleItem] = ???
 
-  override def generalConfirm(scheduleItem: ScheduleItem): Confirmation = ???
+  override def generalConfirm(scheduleItem: ScheduleItem): DomainRepository[SParticipant] =>Confirmation = ???
 
-  override def cancel(confirmation: Confirmation): Try[Boolean] = ???
+  override def cancel(confirmation: Confirmation): DomainRepository[SParticipant] =>Try[Boolean] = ???
 
-  override def run(confirmation: Confirmation): SEvent = ???
+  override def run(confirmation: Confirmation): DomainRepository[SParticipant] =>SEvent = ???
 
   override def status(event: SEvent): EventStatus = ???
 
-  override def possibleLocationsForEvent(event: SEvent): Seq[ScheduleItem] = ???
+  override def possibleLocationsForEvent(event: SEvent): DomainRepository[SParticipant] => Seq[ScheduleItem] = ???
 
-  override def possibleParticipantsInEvent(event: SEvent): Seq[SParticipant] = ???
+  override def possibleParticipantsInEvent(event: SEvent): DomainRepository[SParticipant] => Seq[SParticipant] = ???
 }

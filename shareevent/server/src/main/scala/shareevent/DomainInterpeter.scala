@@ -1,6 +1,7 @@
 package shareevent
 
 import org.joda.time.DateTime
+import org.joda.time.{Duration => JodaDuration}
 import shareevent.model.{Coordinate, EventStatus}
 
 import scala.concurrent.duration.Duration
@@ -21,11 +22,13 @@ trait DomainInterpeter {
 
   type Money <: Number
 
+  implicit val moneyNumeric: Numeric[Money]
+
+
   case class ScheduleItem(event: Event,
                           location: Location,
                           time: DateTime,
-                          participants: Seq[Participant],
-                          locationConfirm: Boolean)
+                          participants: Seq[Participant])
 
   case class Confirmation(scheduleItem: ScheduleItem)
 
@@ -34,9 +37,9 @@ trait DomainInterpeter {
                   title: String,
                   theme: String,
                   organizerCost: Money,
-                  duration: Duration,
+                  duration: JodaDuration,
                   startPossibleSchedule: DateTime,
-                  endPossibleSchedule: DateTime): Try[Event]
+                  endPossibleSchedule: DateTime): DomainRepository[Participant] => Try[Event]
 
 
 
@@ -44,30 +47,45 @@ trait DomainInterpeter {
                      startSchedule: DateTime,
                      endSchedule: DateTime,
                      coordination: Coordinate,
-                     costs: Money): Try[Location]
+                     costs: Money): DomainRepository[Participant] => Try[Location]
 
 
   /**
     * If participant is interested in event, he can participate
     * in scheduling of one.
     */
-  def participantInterest(event:Event, participant: Participant): Boolean
+  def participantInterest(event:Event, participant: Participant): DomainRepository[Participant] => Boolean
 
-  def schedule(event: Event, location: Location, time: DateTime, cost: Money): Try[ScheduleItem]
+  def schedule(event: Event, location: Location, time: DateTime, cost: Money): DomainRepository[Participant] => Try[ScheduleItem]
 
-  def locationConfirm(scheduleItem: ScheduleItem): ScheduleItem
+  def locationConfirm(scheduleItem: ScheduleItem): DomainRepository[Participant] => Try[ScheduleItem]
 
-  def generalConfirm(scheduleItem: ScheduleItem): Confirmation
+  def generalConfirm(scheduleItem: ScheduleItem): DomainRepository[Participant] => Confirmation
 
-  def cancel(confirmation: Confirmation): Try[Boolean]
+  def cancel(confirmation: Confirmation): DomainRepository[Participant] => Try[Boolean]
 
-  def run(confirmation: Confirmation): Event
+  def run(confirmation: Confirmation): DomainRepository[Participant] => Event
 
   def status(event:Event): EventStatus
 
-  def possibleLocationsForEvent(event:Event): Seq[ScheduleItem]
+  def possibleLocationsForEvent(event:Event): DomainRepository[Participant] => Seq[ScheduleItem]
 
-  def possibleParticipantsInEvent(event: Event): Seq[Participant]
+  def possibleParticipantsInEvent(event: Event): DomainRepository[Participant] => Seq[Participant]
 
+  def bestScheduleLocations(scheduleItems: Seq[ScheduleItem]): DomainRepository[Participant] => Try[ScheduleItem] = ???
+
+  def runEvent(organizer: Organizer, title: String): DomainRepository[Participant] => Try[ScheduleItem] =
+  repo => {
+    for {event <- createEvent(organizer, title, theme = "*",
+        implicitly[Numeric[Money]].zero,
+        duration = JodaDuration.standardHours(2),
+        startPossibleSchedule = new DateTime().plusDays(1),
+        endPossibleSchedule = new DateTime().plusDays(14))(repo)
+         scheduledItems = possibleLocationsForEvent(event)(repo)
+         scheduledItem <- bestScheduleLocations(scheduledItems)(repo)
+    } yield {
+        scheduledItem
+    }
+  }
 
 }
