@@ -56,9 +56,12 @@ class ServerRoute(implicit actorSystem: ActorSystem,
           case Success(entity) => complete(OK -> write(entity))
           case Failure(ex)    => complete(Conflict -> ex.getMessage)
         }
-      } ~ authenticateOrRejectWithChallenge(myUserPassAuthenticator).apply { userId =>
-        (delete & parameter('login.as[String])){ login =>
-          complete(InternalServerError -> "Not implemented") // TODO: implement this and authenticator above
+      } ~
+      delete {
+        authenticateOrRejectWithChallenge(myUserPassAuthenticator).apply { userId =>
+          parameter('login.as[String]) { login =>
+            complete(InternalServerError -> "Not implemented") // TODO: implement this and authenticator above
+          }
         }
       }
     }
