@@ -1,25 +1,17 @@
 package shareevent.model
 
 
-trait Person {
-
-  def login: String
-  def password: String
-  def email: Option[String]
-  def slackId: Option[String]
-  def phoneNo: Option[String]
-
+object Role extends Enumeration
+{
+  val Organizer,Participant = Value
 }
 
-case class Organizer( login: String,
-                       password: String,
-                       email: Option[String] = None,
-                       slackId: Option[String] = None,
-                       phoneNo: Option[String] = None) extends  Person
-
-case class Participant( login: String,
-                         password: String,
-                         email: Option[String] = None,
-                         slackId: Option[String] = None,
-                         phoneNo: Option[String] = None) extends  Person
+case class Person (
+                    login: String,
+                    password: String,
+                    role: Role.Value,
+                    email: Option[String] = None,
+                    slackId: Option[String] = None,
+                    phoneNo: Option[String] = None
+                  )
 

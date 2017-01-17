@@ -1,7 +1,7 @@
 package shareevent
 
 import org.joda.time.DateTime
-import shareevent.model.Participant
+import shareevent.model.{Person}
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -9,6 +9,7 @@ import scala.util.Try
 
 trait DomainContext {
 
+  type Participant = Person
 
   trait Repository {
 

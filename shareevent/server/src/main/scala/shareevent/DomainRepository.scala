@@ -1,12 +1,10 @@
 package shareevent
 
 import org.joda.time.DateTime
-import shareevent.model.Participant
-
-import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Success, Try}
 
 class InMemoryContext extends DomainContext {
+
 
   class InMemoryRepo extends Repository {
 

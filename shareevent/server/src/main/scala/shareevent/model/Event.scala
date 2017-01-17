@@ -6,7 +6,7 @@ import org.joda.time.{Duration=>JodaDuration}
 case class Event(
                 title: String,
                 theme: String,
-                organizer: Organizer,
+                organizer: Person,
                 organizerCost: Money,
                 status: EventStatus,
                 created: DateTime,

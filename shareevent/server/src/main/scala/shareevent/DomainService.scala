@@ -12,12 +12,12 @@ trait DomainService {
   case class ScheduleItem(event: Event,
                           location: Location,
                           time: DateTime,
-                          participants: Seq[Participant])
+                          participants: Seq[Person])
 
   case class Confirmation(scheduleItem: ScheduleItem)
 
 
-  def createEvent(organizer: Organizer,
+  def createEvent(organizer: Person,
                   title: String,
                   theme: String,
                   organizerCost: Money = Money.zero,
@@ -38,7 +38,7 @@ trait DomainService {
     * If participant is interested in event, he can participate
     * in scheduling of one.
     */
-  def participantInterest(event:Event, participant: Participant): (DomainContext) => Try[Boolean]
+  def participantInterest(event:Event, participant: Person): (DomainContext) => Try[Boolean]
 
   def schedule(event: Event, location: Location, time: DateTime, cost: Money): DomainContext => Try[ScheduleItem]
 
@@ -52,7 +52,7 @@ trait DomainService {
 
   def possibleLocationsForEvent(event:Event): DomainContext => Seq[ScheduleItem]
 
-  def possibleParticipantsInEvent(event: Event): DomainContext => Seq[Participant]
+  def possibleParticipantsInEvent(event: Event): DomainContext => Seq[Person]
 
 
 }

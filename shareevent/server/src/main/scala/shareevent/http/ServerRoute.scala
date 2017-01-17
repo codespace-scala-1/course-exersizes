@@ -7,7 +7,7 @@ import akka.http.scaladsl.model.headers.{BasicHttpCredentials, HttpChallenge}
 import akka.http.scaladsl.server.Directives._
 import akka.stream.Materializer
 import org.json4s.NoTypeHints
-import shareevent.model.Participant
+import shareevent.model.Person
 import shareevent.{DomainContext, DomainService}
 
 import scala.util.Try
@@ -49,9 +49,10 @@ class ServerRoute(implicit actorSystem: ActorSystem,
 
   val route =
     path("participant") {
-      (post & entity(as[Participant])) { participant =>
+      //TODO:  serialize person without role
+      (post & entity(as[Person])) { participant =>
         // TODO:  rewrite use idiomatic loops.
-        val storeResult:Try[Participant] = context.repository.retrieveParticipant(participant.login) flatMap { maybeExisting =>
+        val storeResult:Try[Person] = context.repository.retrieveParticipant(participant.login) flatMap { maybeExisting =>
           if (maybeExisting.isDefined) {
               Failure(new Exception(s"participant already exists"))
           } else {
