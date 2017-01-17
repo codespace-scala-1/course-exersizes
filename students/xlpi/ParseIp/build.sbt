@@ -10,3 +10,5 @@ libraryDependencies ++= Seq(
   "org.scodec" %% "scodec-bits" % "1.1.0",
   "org.scodec" %% "scodec-protocols" % "1.0.0-M5"
 )
+
+## in previous step not compiled sbt with ScalaTestDependencies....it will be demeged...

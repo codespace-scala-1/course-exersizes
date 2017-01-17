@@ -1,5 +1,3 @@
-import Dependencies._
-
 lazy val commonSettings = Seq(
   organization := "com.example",
   scalaVersion := "2.12.1",
@@ -7,8 +5,10 @@ lazy val commonSettings = Seq(
                          /* ,  "-Ymacro-debug-lite"  */
                          /*,   "-Ydebug"  ,  "-Ylog:lambdalift"  */
                      ),
-  libraryDependencies += scalaTest % Test,
-  libraryDependencies += "com.github.nscala-time" %% "nscala-time" % "2.16.0"
+  libraryDependencies ++= Seq (
+    "org.scalatest" %% "scalatest" % "3.0.1" % Test,
+    "com.github.nscala-time" %% "nscala-time" % "2.16.0"
+  )
 )
 
 val akkaVersion = "2.4.16"
