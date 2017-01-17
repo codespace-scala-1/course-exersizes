@@ -5,7 +5,7 @@ import org.joda.time.{Duration => JodaDuration}
 import shareevent.{DomainContext, DomainService}
 import shareevent.model._
 
-import scala.util.Try
+import scala.util.{Success, Try}
 import org.joda.time.Interval
 
 class SimpleService extends DomainService {
@@ -32,7 +32,7 @@ class SimpleService extends DomainService {
   }
 
 
-  override def cancel(confirmation: Confirmation): DomainContext => Option[Event] = context => {
+  override def cancel(confirmation: Confirmation): DomainContext => Try[Event] = context => {
     val item = confirmation.scheduleItem
     val event = item.event
 
@@ -44,7 +44,7 @@ class SimpleService extends DomainService {
         books =
           oldLocation.books filterNot (_ == Booking(interval, event))
       ))
-    Option(event.copy(status = Cancelled))
+    Success(event.copy(status = Cancelled))
   }
 
 

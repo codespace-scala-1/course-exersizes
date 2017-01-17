@@ -46,7 +46,7 @@ trait DomainService {
 
   def generalConfirm(scheduleItem: ScheduleItem): DomainContext => Confirmation
 
-  def cancel(confirmation: Confirmation): DomainContext => Option[Event]
+  def cancel(confirmation: Confirmation): DomainContext => Try[Event]
 
   def run(confirmation: Confirmation): DomainContext => Event
 
