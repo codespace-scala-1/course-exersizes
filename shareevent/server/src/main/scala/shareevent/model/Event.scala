@@ -10,5 +10,6 @@ case class Event(
                 organizerCost: Money,
                 status: EventStatus,
                 created: DateTime,
+                duration: JodaDuration,
                 scheduleWindow: JodaDuration
                 )
