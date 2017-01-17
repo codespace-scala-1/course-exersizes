@@ -51,7 +51,14 @@ class ServerRoute(implicit actorSystem: ActorSystem,
     path("participant") {
       //TODO:  serialize person without role
       (post & entity(as[Person])) { participant =>
+
+        val storeResult:Try[Person] =
+          for { op <- context.repository.retrieveParticipant(participant.login)
+                t <- op.toLeft({context.repository.storeParticipant(participant: Person) map (_ => participant)})
+          } yield t
+
         // TODO:  rewrite use idiomatic loops.
+        /*
         val storeResult:Try[Person] = context.repository.retrieveParticipant(participant.login) flatMap { maybeExisting =>
           if (maybeExisting.isDefined) {
               Failure(new Exception(s"participant already exists"))
@@ -59,6 +66,8 @@ class ServerRoute(implicit actorSystem: ActorSystem,
               context.repository.storeParticipant(participant) map (_ => participant)
           }
         }
+        */
+
         onComplete(Future.fromTry(storeResult)) {
           case Success(entity) => complete(OK -> write(entity))
           case Failure(ex)    => complete(Conflict -> ex.getMessage)
