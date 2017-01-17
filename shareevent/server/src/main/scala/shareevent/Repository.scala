@@ -18,10 +18,17 @@ trait DomainContext {
 
     def delete(login: String): Try[Unit]
 
+    def store[T](obj: T)
+
+    def retrieve[K](key: K)
+
+    def delete[T](obj: T)
   }
 
   val repository: Repository
 
   def currentTime: DateTime
+
+
 
 }

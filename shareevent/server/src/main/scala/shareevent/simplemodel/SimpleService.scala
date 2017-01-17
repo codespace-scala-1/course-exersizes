@@ -8,7 +8,6 @@ import shareevent.model._
 import scala.util.Try
 
 
-
 class SimpleService extends DomainService {
 
 
@@ -31,12 +30,16 @@ class SimpleService extends DomainService {
   override def generalConfirm(scheduleItem: ScheduleItem): DomainContext =>Confirmation =
     { _ => Confirmation(scheduleItem) }
 
-  override def cancel(confirmation: Confirmation): DomainContext =>Try[Boolean] = ???
+  override def cancel(confirmation: Confirmation): DomainContext => Option[Event] = context => {
+    val item = confirmation.scheduleItem
+    context.repository.delete(item.location)
+    Option(item.event.copy(status = Cancelled))
+  }
+
 
   override def run(confirmation: Confirmation): DomainContext => Event = ???
 
   override def possibleLocationsForEvent(event: Event): DomainContext => Seq[ScheduleItem] = ???
 
   override def possibleParticipantsInEvent(event: Event): DomainContext => Seq[Participant] = ???
-
 }

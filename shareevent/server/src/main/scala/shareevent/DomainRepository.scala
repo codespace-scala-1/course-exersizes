@@ -27,6 +27,12 @@ class InMemoryContext extends DomainContext {
         participants = participants - p
       }
     }
+
+    override def store[T](obj: T): Unit = ???
+
+    override def retrieve[K](key: K): Unit = ???
+
+    override def delete[T](obj: T): Unit = ???
   }
 
   def checkExistence[T](op:Option[T]): Try[T] =
