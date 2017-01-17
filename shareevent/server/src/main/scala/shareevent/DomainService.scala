@@ -40,7 +40,7 @@ trait DomainService {
     */
   def participantInterest(event:Event, participant: Participant): (DomainContext) => Try[Boolean]
 
-  def schedule(event: Event, location: Location, time: DateTime, cost: Money): DomainContext => Try[ScheduleItem]
+  def schedule(event: Event, location: Location, time: DateTime): DomainContext => Try[ScheduleItem]
 
   def locationConfirm(scheduleItem: ScheduleItem): DomainContext => Try[ScheduleItem]
 
