@@ -38,7 +38,7 @@ trait DomainService {
     * If participant is interested in event, he can participate
     * in scheduling of one.
     */
-  def participantInterest(event:Event, participant: Participant): DomainContext => Boolean
+  def participantInterest(event:Event, participant: Participant): (DomainContext) => Try[Boolean]
 
   def schedule(event: Event, location: Location, time: DateTime, cost: Money): DomainContext => Try[ScheduleItem]
 
