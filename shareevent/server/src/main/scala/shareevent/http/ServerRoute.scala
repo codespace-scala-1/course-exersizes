@@ -7,8 +7,8 @@ import akka.http.scaladsl.model.headers.{BasicHttpCredentials, HttpChallenge}
 import akka.http.scaladsl.server.Directives._
 import akka.stream.Materializer
 import org.json4s.NoTypeHints
-import shareevent.{DomainInterpeter, DomainContext}
-import shareevent.simplemodel.SParticipant
+import shareevent.model.Participant
+import shareevent.{DomainContext, DomainService}
 
 import scala.util.Try
 //import grizzled.slf4j.Logging
@@ -23,35 +23,41 @@ import scala.util.{Failure, Success}
 class ServerRoute(implicit actorSystem: ActorSystem,
                   materializer: Materializer,
                   execCtx: ExecutionContext,
-                  context: DomainContext[SParticipant],
-                  service: DomainInterpeter) extends Json4sSupport {
+                  context: DomainContext,
+                  service: DomainService) extends Json4sSupport {
   implicit val formats = Serialization.formats(NoTypeHints)
   implicit val serialization = Serialization
   private val challenge = HttpChallenge("Basic", "realm")
 
+  def authenticated(login: String, password: String): Boolean = {
+
+    context.repository.retrieveParticipant(login) match {
+      case Success(Some(participant)) => participant.password == password
+      case _ => false
+    }
+  }
 
   val myUserPassAuthenticator: Option[BasicHttpCredentials] => Future[AuthenticationResult[String]] =
     userPass => {
 
-      val maybeUser = for{ BasicHttpCredentials(user,password) <- userPass if user=="me" && password == "me" } yield user
+      val maybeUser = for{ BasicHttpCredentials(login, password) <- userPass if authenticated(login, password)} yield login
 
       val authResult = maybeUser.toRight(challenge)
 
       Future.successful(authResult)
-
     }
 
   val route =
     path("participant") {
-      (post & entity(as[SParticipant])) { participant =>
-        val storeResult:Try[SParticipant] = context.repository.retrieveParticipant(participant.login) flatMap { maybeExisting =>
+      (post & entity(as[Participant])) { participant =>
+        // TODO:  rewrite use idiomatic loops.
+        val storeResult:Try[Participant] = context.repository.retrieveParticipant(participant.login) flatMap { maybeExisting =>
           if (maybeExisting.isDefined) {
               Failure(new Exception(s"participant already exists"))
           } else {
               context.repository.storeParticipant(participant) map (_ => participant)
           }
         }
-
         onComplete(Future.fromTry(storeResult)) {
           case Success(entity) => complete(OK -> write(entity))
           case Failure(ex)    => complete(Conflict -> ex.getMessage)
@@ -60,7 +66,16 @@ class ServerRoute(implicit actorSystem: ActorSystem,
       delete {
         authenticateOrRejectWithChallenge(myUserPassAuthenticator).apply { userId =>
           parameter('login.as[String]) { login =>
-            complete(InternalServerError -> "Not implemented") // TODO: implement this and authenticator above
+
+            if(userId != login) {
+              complete(Conflict -> "Not authorized to delete other participant")
+            }
+            else {
+              context.repository.delete(login) match {
+                case Success(_) => complete(OK -> "DONE")
+                case Failure(ex) => complete(Conflict -> ex.getMessage)
+              }
+            }
           }
         }
       }

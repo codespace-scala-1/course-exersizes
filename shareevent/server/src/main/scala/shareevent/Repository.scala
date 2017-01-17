@@ -1,12 +1,13 @@
 package shareevent
 
 import org.joda.time.DateTime
+import shareevent.model.Participant
 
 import scala.concurrent.Future
 import scala.util.Try
 
 
-trait DomainContext[Participant] {
+trait DomainContext {
 
 
   trait Repository {
@@ -15,9 +16,11 @@ trait DomainContext[Participant] {
 
     def retrieveParticipant(login: String): Try[Option[Participant]]
 
+    def delete(login: String): Try[Unit]
+
   }
 
-  def repository: Repository
+  val repository: Repository
 
   def currentTime: DateTime
 
