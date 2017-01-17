@@ -9,12 +9,6 @@ import scala.util.Try
 trait DomainService {
 
 
-  case class ScheduleItem(event: Event,
-                          location: Location,
-                          time: DateTime,
-                          participants: Seq[Person])
-
-  case class Confirmation(scheduleItem: ScheduleItem)
 
 
   def createEvent(organizer: Person,

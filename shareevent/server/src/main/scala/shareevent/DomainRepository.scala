@@ -31,6 +31,9 @@ class InMemoryContext extends DomainContext {
 
     lazy val locationDAO: DAO[Long,Location] = ???
 
+
+
+
   }
 
   def checkExistence[T](op:Option[T]): Try[T] =
