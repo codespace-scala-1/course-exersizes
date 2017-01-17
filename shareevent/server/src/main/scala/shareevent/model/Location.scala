@@ -20,4 +20,6 @@ case class Booking(time: Interval,
 
 case class Location(
   name:  String,
+  capacity:  Int,
+  coordinate: Coordinate,
   books: Seq[Booking] = Seq())

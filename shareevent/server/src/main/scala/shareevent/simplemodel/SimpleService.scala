@@ -1,7 +1,6 @@
 package shareevent.simplemodel
 
-import org.joda.time.DateTime
-import org.joda.time.{Duration => JodaDuration}
+import org.joda.time.{Duration => JodaDuration, DateTime}
 import shareevent.{DomainContext, DomainService}
 import shareevent.model._
 
@@ -13,7 +12,8 @@ class SimpleService extends DomainService {
 
   override def createEvent(organizer: Person, title: String, theme: String, organizerCost: Money, duration: JodaDuration, scheduleWindow: JodaDuration): DomainContext => Try[Event] = ???
 
-  override def createLocation(capacity: Int, startSchedule: DateTime, endSchedule: DateTime, coordination: Coordinate, costs: Money): DomainContext => Try[Location] = ???
+  override def createLocation(name: String, capacity: Int, startSchedule: DateTime, endSchedule: DateTime, coordinate: Coordinate,
+                              costs: Money): DomainContext => Try[Location] = {_ => Try(Location(name, capacity, coordinate, Seq.empty))}
 
   /**
     * If participant is interested in event, he can participate

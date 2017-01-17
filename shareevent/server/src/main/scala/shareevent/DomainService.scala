@@ -20,8 +20,8 @@ trait DomainService {
                  ): DomainContext => Try[Event]
 
 
-
-  def createLocation(capacity: Int,
+  def createLocation(name: String,
+                     capacity: Int,
                      startSchedule: DateTime,
                      endSchedule: DateTime,
                      coordination: Coordinate,
