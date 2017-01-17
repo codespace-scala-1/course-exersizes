@@ -1,0 +1,69 @@
+package shareevent
+
+import org.joda.time.{DateTime, Duration => JodaDuration}
+import shareevent.model._
+
+import scala.concurrent.duration.Duration
+import scala.util.Try
+
+trait DomainService {
+
+
+  case class ScheduleItem(event: Event,
+                          location: Location,
+                          time: DateTime,
+                          participants: Seq[Participant])
+
+  case class Confirmation(scheduleItem: ScheduleItem)
+
+
+  def createEvent(organizer: Organizer,
+                  title: String,
+                  theme: String,
+                  organizerCost: Money = Money.zero,
+                  duration: JodaDuration = JodaDuration.standardHours(2),
+                  scheduleWindow: JodaDuration = JodaDuration.standardDays(14)
+                 ): DomainContext => Try[Event]
+
+
+
+  def createLocation(capacity: Int,
+                     startSchedule: DateTime,
+                     endSchedule: DateTime,
+                     coordination: Coordinate,
+                     costs: Money): DomainContext => Try[Location]
+
+
+  /**
+    * If participant is interested in event, he can participate
+    * in scheduling of one.
+    */
+  def participantInterest(event:Event, participant: Participant): DomainContext => Boolean
+
+  def schedule(event: Event, location: Location, time: DateTime, cost: Money): DomainContext => Try[ScheduleItem]
+
+  def locationConfirm(scheduleItem: ScheduleItem): DomainContext => Try[ScheduleItem]
+
+  def generalConfirm(scheduleItem: ScheduleItem): DomainContext => Confirmation
+
+  def cancel(confirmation: Confirmation): DomainContext => Try[Boolean]
+
+  def run(confirmation: Confirmation): DomainContext => Event
+
+  def possibleLocationsForEvent(event:Event): DomainContext => Seq[ScheduleItem]
+
+  def possibleParticipantsInEvent(event: Event): DomainContext => Seq[Participant]
+
+  def bestScheduleLocations(scheduleItems: Seq[ScheduleItem]): DomainContext => Try[ScheduleItem] = ???
+
+  def runEvent(organizer: Organizer, title: String): DomainContext => Try[ScheduleItem] =
+  repo => {
+    for {event <- createEvent(organizer, title, theme = "*")(repo)
+         scheduledItems = possibleLocationsForEvent(event)(repo)
+         scheduledItem <- bestScheduleLocations(scheduledItems)(repo)
+    } yield {
+        scheduledItem
+    }
+  }
+
+}
