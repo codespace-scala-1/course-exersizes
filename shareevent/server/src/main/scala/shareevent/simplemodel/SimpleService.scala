@@ -11,7 +11,7 @@ import scala.util.Try
 class SimpleService extends DomainService {
 
 
-  override def createEvent(organizer: Organizer, title: String, theme: String, organizerCost: Money, duration: JodaDuration, scheduleWindow: JodaDuration): DomainContext => Try[Event] = ???
+  override def createEvent(organizer: Person, title: String, theme: String, organizerCost: Money, duration: JodaDuration, scheduleWindow: JodaDuration): DomainContext => Try[Event] = ???
 
   override def createLocation(capacity: Int, startSchedule: DateTime, endSchedule: DateTime, coordination: Coordinate, costs: Money): DomainContext => Try[Location] = ???
 
@@ -19,7 +19,7 @@ class SimpleService extends DomainService {
     * If participant is interested in event, he can participate
     * in scheduling of one.
     */
-  override def participantInterest(event: Event, participant: Participant): (DomainContext) => Try[Boolean] = ???
+  override def participantInterest(event: Event, participant: Person): (DomainContext) => Try[Boolean] = ???
 
   override def schedule(event: Event, location: Location, time: DateTime): DomainContext => Try[ScheduleItem] = {
     _ => Try(ScheduleItem(event, location, time, Seq.empty))
@@ -41,5 +41,6 @@ class SimpleService extends DomainService {
 
   override def possibleLocationsForEvent(event: Event): DomainContext => Seq[ScheduleItem] = ???
 
-  override def possibleParticipantsInEvent(event: Event): DomainContext => Seq[Participant] = ???
+  override def possibleParticipantsInEvent(event: Event): DomainContext => Seq[Person] = ???
+
 }
