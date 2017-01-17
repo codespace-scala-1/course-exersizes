@@ -1,16 +1,21 @@
 package shareevent.simplemodel
 
-import org.joda.time.{Duration => JodaDuration, DateTime}
+import org.joda.time.{DateTime, Duration => JodaDuration}
 import shareevent.{DomainContext, DomainService}
 import shareevent.model._
 
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 import org.joda.time.Interval
 
 class SimpleService extends DomainService {
 
 
-  override def createEvent(organizer: Person, title: String, theme: String, organizerCost: Money, duration: JodaDuration, scheduleWindow: JodaDuration): DomainContext => Try[Event] = ???
+  def createEvent(organizer: Person, title: String, theme: String, organizerCost: Money, duration: JodaDuration, scheduleWindow: JodaDuration, quantityOfParticipants: Int): DomainContext => Try[Event] = {
+    require(organizer.role == Role.Organizer && quantityOfParticipants >= Event("","",organizer,organizerCost,Initial,DateTime.now(),duration,scheduleWindow).minParticipantsQuantity)
+    _ => Try {
+      Event(title, theme, organizer, organizerCost, Initial, DateTime.now(), duration, scheduleWindow)
+    }
+  }
 
   override def createLocation(name: String, capacity: Int, startSchedule: DateTime, endSchedule: DateTime, coordinate: Coordinate,
                               costs: Money): DomainContext => Try[Location] = {_ => Try(Location(name, capacity, coordinate, Seq.empty))}
