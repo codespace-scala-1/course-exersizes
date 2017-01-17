@@ -21,12 +21,16 @@ class InMemoryContext extends DomainContext {
       Try(participants.find(_.login == login))
 
     def delete(login: String): Try[Unit] = {
-      retrieveParticipant(login) map {
-        case Some(participant) => participants = participants - participant
+      for {op <- retrieveParticipant(login)
+           p <- checkExistence(op)
+      }  yield {
+        participants = participants - p
       }
-      Success(())
     }
   }
+
+  def checkExistence[T](op:Option[T]): Try[T] =
+    op.toRight(new IllegalStateException("login not found")).toTry
 
   override val repository = new InMemoryRepo {}
 

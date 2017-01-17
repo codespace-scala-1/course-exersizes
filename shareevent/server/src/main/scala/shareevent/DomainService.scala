@@ -40,7 +40,7 @@ trait DomainService {
     */
   def participantInterest(event:Event, participant: Participant): (DomainContext) => Try[Boolean]
 
-  def schedule(event: Event, location: Location, time: DateTime, cost: Money): DomainContext => Try[ScheduleItem]
+  def schedule(event: Event, location: Location, time: DateTime): DomainContext => Try[ScheduleItem]
 
   def locationConfirm(scheduleItem: ScheduleItem): DomainContext => Try[ScheduleItem]
 
@@ -54,16 +54,5 @@ trait DomainService {
 
   def possibleParticipantsInEvent(event: Event): DomainContext => Seq[Participant]
 
-  def bestScheduleLocations(scheduleItems: Seq[ScheduleItem]): DomainContext => Try[ScheduleItem] = ???
-
-  def runEvent(organizer: Organizer, title: String): DomainContext => Try[ScheduleItem] =
-  repo => {
-    for {event <- createEvent(organizer, title, theme = "*")(repo)
-         scheduledItems = possibleLocationsForEvent(event)(repo)
-         scheduledItem <- bestScheduleLocations(scheduledItems)(repo)
-    } yield {
-        scheduledItem
-    }
-  }
 
 }
