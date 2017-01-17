@@ -26,7 +26,8 @@ class SimpleService extends DomainService {
 
   override def locationConfirm(scheduleItem: ScheduleItem): DomainContext => Try[ScheduleItem] = ???
 
-  override def generalConfirm(scheduleItem: ScheduleItem): DomainContext =>Confirmation = ???
+  override def generalConfirm(scheduleItem: ScheduleItem): DomainContext =>Confirmation =
+    { _ => Confirmation(scheduleItem) }
 
   override def cancel(confirmation: Confirmation): DomainContext =>Try[Boolean] = ???
 
@@ -35,4 +36,5 @@ class SimpleService extends DomainService {
   override def possibleLocationsForEvent(event: Event): DomainContext => Seq[ScheduleItem] = ???
 
   override def possibleParticipantsInEvent(event: Event): DomainContext => Seq[Participant] = ???
+
 }
