@@ -22,7 +22,9 @@ class SimpleService extends DomainService {
     */
   override def participantInterest(event: Event, participant: Person): (DomainContext) => Try[Boolean] = ???
 
-  override def schedule(event: Event, location: Location, time: DateTime, cost: Money):DomainContext => Try[ScheduleItem] = ???
+  override def schedule(event: Event, location: Location, time: DateTime): DomainContext => Try[ScheduleItem] = {
+    _ => Try(ScheduleItem(event, location, time, Seq.empty))
+  }
 
   override def locationConfirm(scheduleItem: ScheduleItem): DomainContext => Try[ScheduleItem] = ???
 
