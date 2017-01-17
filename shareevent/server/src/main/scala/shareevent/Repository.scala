@@ -15,9 +15,11 @@ trait DomainContext[Participant] {
 
     def retrieveParticipant(login: String): Try[Option[Participant]]
 
+    def delete(login: String): Try[Unit]
+
   }
 
-  def repository: Repository
+  val repository: Repository
 
   def currentTime: DateTime
 

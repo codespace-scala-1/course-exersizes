@@ -29,16 +29,22 @@ class ServerRoute(implicit actorSystem: ActorSystem,
   implicit val serialization = Serialization
   private val challenge = HttpChallenge("Basic", "realm")
 
+  def authenticated(login: String, password: String): Boolean = {
+
+    context.repository.retrieveParticipant(login) match {
+      case Success(Some(participant)) => participant.password == password
+      case _ => false
+    }
+  }
 
   val myUserPassAuthenticator: Option[BasicHttpCredentials] => Future[AuthenticationResult[String]] =
     userPass => {
 
-      val maybeUser = for{ BasicHttpCredentials(user,password) <- userPass if user=="me" && password == "me" } yield user
+      val maybeUser = for{ BasicHttpCredentials(login, password) <- userPass if authenticated(login, password)} yield login
 
       val authResult = maybeUser.toRight(challenge)
 
       Future.successful(authResult)
-
     }
 
   val route =
@@ -60,7 +66,16 @@ class ServerRoute(implicit actorSystem: ActorSystem,
       delete {
         authenticateOrRejectWithChallenge(myUserPassAuthenticator).apply { userId =>
           parameter('login.as[String]) { login =>
-            complete(InternalServerError -> "Not implemented") // TODO: implement this and authenticator above
+
+            if(userId != login) {
+              complete(Conflict -> "Not authorized to delete other participant")
+            }
+            else {
+              context.repository.delete(login) match {
+                case Success(_) => complete(OK -> "DONE")
+                case Failure(ex) => complete(Conflict -> ex.getMessage)
+              }
+            }
           }
         }
       }

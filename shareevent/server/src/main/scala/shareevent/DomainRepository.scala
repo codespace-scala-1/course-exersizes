@@ -17,11 +17,18 @@ class InMemoryContext extends DomainContext[SParticipant] {
       Success(())
     }
 
-    def retrieveParticipant(login: String) =
+    def retrieveParticipant(login: String): Try[Option[SParticipant]] =
       Try(participants.find(_.login == login))
+
+    def delete(login: String): Try[Unit] = {
+      retrieveParticipant(login) map {
+        case Some(participant) => participants = participants - participant
+      }
+      Success(())
+    }
   }
 
-  override def repository = new InMemoryRepo {}
+  override val repository = new InMemoryRepo {}
 
   override def currentTime: DateTime = new DateTime()
 
