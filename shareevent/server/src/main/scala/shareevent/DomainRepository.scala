@@ -17,7 +17,7 @@ class InMemoryContext extends DomainContext {
       Success(())
     }
 
-    def retrieveParticipant(login: String): Try[Option[SParticipant]] =
+    def retrieveParticipant(login: String): Try[Option[Participant]] =
       Try(participants.find(_.login == login))
 
     def delete(login: String): Try[Unit] = {
