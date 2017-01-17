@@ -33,19 +33,19 @@ class SimpleService extends DomainService {
 
 
   override def cancel(confirmation: Confirmation): DomainContext => Try[Event] = context => {
-
     val item = confirmation.scheduleItem
     val event = item.event
 
-    val oldLocation = item.location
-    val interval = item.interval
+    val location = item.location
+    val updatedLocation = location.copy(
+      books = location.books filterNot (_ == Booking(item.interval, event))
+    )
 
-    val updatedLocation = oldLocation.copy(
-        books =
-          oldLocation.books filterNot (_ == Booking(interval, event))
-      )
-    for{ _ <- context.repository.locationDAO.store(updatedLocation)
-         e = event.copy(status = Cancelled) } yield e
+    item.copy(location = updatedLocation)
+    for {
+      _ <- context.repository.retrieveDao().merge(updatedLocation)
+       e = event.copy(status = Cancelled)
+    } yield e
   }
 
 
