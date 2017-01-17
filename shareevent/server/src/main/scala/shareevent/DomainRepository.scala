@@ -1,6 +1,8 @@
 package shareevent
 
 import org.joda.time.DateTime
+import shareevent.model.Location
+
 import scala.util.{Success, Try}
 
 class InMemoryContext extends DomainContext {
@@ -18,19 +20,17 @@ class InMemoryContext extends DomainContext {
     def retrieveParticipant(login: String): Try[Option[Participant]] =
       Try(participants.find(_.login == login))
 
-    def delete(login: String): Try[Unit] = {
-      for {op <- retrieveParticipant(login)
-           p <- checkExistence(op)
-      }  yield {
-        participants = participants - p
+    def deleteParticipant(login: String): Try[Boolean] = {
+      for {op <- retrieveParticipant(login) } yield {
+        op.foreach{ p =>
+          participants = participants - p
+        }
+        op.isDefined
       }
     }
 
-    override def store[T](obj: T): Unit = ???
+    lazy val locationDAO: DAO[Long,Location] = ???
 
-    override def retrieve[K](key: K): Unit = ???
-
-    override def delete[T](obj: T): Unit = ???
   }
 
   def checkExistence[T](op:Option[T]): Try[T] =

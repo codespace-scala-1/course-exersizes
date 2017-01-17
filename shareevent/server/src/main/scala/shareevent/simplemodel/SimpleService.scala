@@ -30,9 +30,12 @@ class SimpleService extends DomainService {
   override def generalConfirm(scheduleItem: ScheduleItem): DomainContext =>Confirmation =
     { _ => Confirmation(scheduleItem) }
 
+
+
   override def cancel(confirmation: Confirmation): DomainContext => Option[Event] = context => {
     val item = confirmation.scheduleItem
-    context.repository.delete(item.location)
+    ???
+    //context.repository.delete(item.location)
     Option(item.event.copy(status = Cancelled))
   }
 

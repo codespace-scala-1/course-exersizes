@@ -72,7 +72,7 @@ class ServerRoute(implicit actorSystem: ActorSystem,
               complete(Conflict -> "Not authorized to delete other participant")
             }
             else {
-              context.repository.delete(login) match {
+              context.repository.deleteParticipant(login) match {
                 case Success(_) => complete(OK -> "DONE")
                 case Failure(ex) => complete(Conflict -> ex.getMessage)
               }

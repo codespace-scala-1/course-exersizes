@@ -13,17 +13,23 @@ trait DomainContext {
 
   trait Repository {
 
+    //TODO: refactor
     def storeParticipant(p: Participant): Try[Unit]
 
+    //TODO: refactor
     def retrieveParticipant(login: String): Try[Option[Participant]]
 
-    def delete(login: String): Try[Unit]
+    def deleteParticipant(login:String): Try[Boolean]
 
-    def store[T](obj: T)
+    trait DAO[K,T] {
 
-    def retrieve[K](key: K)
+      def store(obj: T): Try[T]
 
-    def delete[T](obj: T)
+      def retrieve(key: K): Try[Option[T]]
+
+      def delete(key: K): Try[Boolean]
+    }
+
   }
 
   val repository: Repository
