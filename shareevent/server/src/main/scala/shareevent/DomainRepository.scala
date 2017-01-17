@@ -1,18 +1,18 @@
 package shareevent
 
 import org.joda.time.DateTime
-import shareevent.simplemodel.SParticipant
+import shareevent.model.Participant
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Success, Try}
 
-class InMemoryContext extends DomainContext[SParticipant] {
+class InMemoryContext extends DomainContext {
 
   class InMemoryRepo extends Repository {
 
-    private var participants = Set[SParticipant]()
+    private var participants = Set[Participant]()
 
-    def storeParticipant(participant: SParticipant): Try[Unit] = {
+    def storeParticipant(participant: Participant): Try[Unit] = {
       participants = participants + participant
       Success(())
     }

@@ -7,8 +7,8 @@ import akka.http.scaladsl.model.headers.{BasicHttpCredentials, HttpChallenge}
 import akka.http.scaladsl.server.Directives._
 import akka.stream.Materializer
 import org.json4s.NoTypeHints
-import shareevent.{DomainInterpeter, DomainContext}
-import shareevent.simplemodel.SParticipant
+import shareevent.model.Participant
+import shareevent.{DomainContext, DomainService}
 
 import scala.util.Try
 //import grizzled.slf4j.Logging
@@ -23,8 +23,8 @@ import scala.util.{Failure, Success}
 class ServerRoute(implicit actorSystem: ActorSystem,
                   materializer: Materializer,
                   execCtx: ExecutionContext,
-                  context: DomainContext[SParticipant],
-                  service: DomainInterpeter) extends Json4sSupport {
+                  context: DomainContext,
+                  service: DomainService) extends Json4sSupport {
   implicit val formats = Serialization.formats(NoTypeHints)
   implicit val serialization = Serialization
   private val challenge = HttpChallenge("Basic", "realm")
@@ -49,15 +49,15 @@ class ServerRoute(implicit actorSystem: ActorSystem,
 
   val route =
     path("participant") {
-      (post & entity(as[SParticipant])) { participant =>
-        val storeResult:Try[SParticipant] = context.repository.retrieveParticipant(participant.login) flatMap { maybeExisting =>
+      (post & entity(as[Participant])) { participant =>
+        // TODO:  rewrite use idiomatic loops.
+        val storeResult:Try[Participant] = context.repository.retrieveParticipant(participant.login) flatMap { maybeExisting =>
           if (maybeExisting.isDefined) {
               Failure(new Exception(s"participant already exists"))
           } else {
               context.repository.storeParticipant(participant) map (_ => participant)
           }
         }
-
         onComplete(Future.fromTry(storeResult)) {
           case Success(entity) => complete(OK -> write(entity))
           case Failure(ex)    => complete(Conflict -> ex.getMessage)
