@@ -33,9 +33,7 @@ trait DomainContext {
       def merge(instance: T): Try[T]
     }
 
-    lazy val locationDAO: DAO[Long, Location]
-
-    val locationDAO : DAO[Long,Location]
+    lazy val locationDAO: DAO[Long, Location] = ???
 
   }
 

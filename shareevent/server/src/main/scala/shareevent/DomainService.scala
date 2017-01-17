@@ -3,7 +3,6 @@ package shareevent
 import org.joda.time.{DateTime, Duration => JodaDuration}
 import shareevent.model._
 
-import scala.concurrent.duration.Duration
 import scala.util.Try
 
 trait DomainService {
