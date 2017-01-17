@@ -1,7 +1,6 @@
 package shareevent.model
 
-import org.joda.time.DateTime
-import org.joda.time.{Duration=>JodaDuration}
+import org.joda.time.{DateTime, Interval, Duration => JodaDuration}
 
 case class Event(
                 title: String,
@@ -16,3 +15,12 @@ case class Event(
                 ) {
   val minParticipantsQuantity: Int = minQuantityParticipants
 }
+
+case class ScheduleItem(event: Event,
+                        location: Location,
+                        time: DateTime,
+                        participants: Seq[Person]) {
+  lazy val interval = new Interval(time,event.duration)
+}
+
+case class Confirmation(scheduleItem: ScheduleItem)
