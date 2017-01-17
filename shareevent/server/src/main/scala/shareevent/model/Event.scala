@@ -11,5 +11,8 @@ case class Event(
                 status: EventStatus,
                 created: DateTime,
                 duration: JodaDuration,
-                scheduleWindow: JodaDuration
-                )
+                scheduleWindow: JodaDuration,
+                minQuantityParticipants: Int = 5
+                ) {
+  val minParticipantsQuantity: Int = minQuantityParticipants
+}
