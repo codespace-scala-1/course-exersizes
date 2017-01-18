@@ -13,13 +13,10 @@ case object BookingStatus {
 }
 
 case class Booking(time: Interval,
-                   event: Event,
-                   status: BookingStatus = BookingStatus.Preliminary)
+                    event: Event,
+                    status: BookingStatus = BookingStatus.Preliminary)
 
-
-
-case class Location(
-  name:  String,
-  capacity:  Int,
-  coordinate: Coordinate,
-  books: Seq[Booking] = Seq())
+case class Location(name:  String,
+                     capacity:  Int,
+                     coordinate: Coordinate,
+                     bookings: Seq[Booking] = Seq())

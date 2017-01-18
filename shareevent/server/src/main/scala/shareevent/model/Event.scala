@@ -20,7 +20,7 @@ case class ScheduleItem(event: Event,
                         location: Location,
                         time: DateTime,
                         participants: Seq[Person]) {
-  lazy val interval = new Interval(time,event.duration)
+  lazy val interval = new Interval(time, event.duration)
 }
 
 case class Confirmation(scheduleItem: ScheduleItem)

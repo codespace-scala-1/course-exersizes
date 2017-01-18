@@ -7,7 +7,6 @@ import scala.util.{Success, Try}
 
 class InMemoryContext extends DomainContext {
 
-
   class InMemoryRepo extends Repository {
 
     private var participants = Set[Participant]()
@@ -29,11 +28,9 @@ class InMemoryContext extends DomainContext {
       }
     }
 
-    lazy val locationDAO: DAO[Long,Location] = ???
+    override lazy val locationDAO: DAO[Long, Location] = ???
 
-
-
-
+    override def retrieveDao[K, T](): DAO[K, T] = ???
   }
 
   def checkExistence[T](op:Option[T]): Try[T] =

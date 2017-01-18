@@ -20,9 +20,9 @@ trait DomainContext {
 
     def deleteParticipant(login:String): Try[Boolean]
 
-    def retrieveDao[K, T](): DAO[K,T] = ???
+    def retrieveDao[K, T](): DAO[K,T]
 
-    trait DAO[K,T] {
+    trait DAO[K, T] {
 
       def store(obj: T): Try[T]
 
@@ -33,8 +33,7 @@ trait DomainContext {
       def merge(instance: T): Try[T]
     }
 
-    lazy val locationDAO: DAO[Long, Location] = ???
-
+    lazy val locationDAO: DAO[Long, Location] = retrieveDao[Long, Location]()
   }
 
   val repository: Repository
