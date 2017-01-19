@@ -1,16 +1,27 @@
 package shareevent.simplemodel
 
-import org.joda.time.{Duration => JodaDuration, DateTime}
+import org.joda.time.{DateTime, Duration => JodaDuration}
 import shareevent.{DomainContext, DomainService}
 import shareevent.model._
 
-import scala.util.{Success, Try}
+import scala.util.{Failure, Success, Try}
 import org.joda.time.Interval
 
 class SimpleService extends DomainService {
 
 
-  override def createEvent(organizer: Person, title: String, theme: String, organizerCost: Money, duration: JodaDuration, scheduleWindow: JodaDuration): DomainContext => Try[Event] = ???
+  def createEvent(organizer: Person, title: String, theme: String, organizerCost: Money, duration: JodaDuration,
+                  scheduleWindow: JodaDuration, quantityOfParticipants: Int): DomainContext => Try[Event] = {
+
+    require(organizer.role == Role.Organizer)
+
+    val eventTry = Try {
+      Event(title, theme, organizer, organizerCost, Initial, DateTime.now(), duration, scheduleWindow)
+    }
+
+    eventTry.foreach(evt => require(quantityOfParticipants >= evt.minParticipantsQuantity))
+    _ => eventTry
+  }
 
   override def createLocation(name: String, capacity: Int, startSchedule: DateTime, endSchedule: DateTime, coordinate: Coordinate,
                               costs: Money): DomainContext => Try[Location] = {_ => Try(Location(name, capacity, coordinate, Seq.empty))}
@@ -32,20 +43,19 @@ class SimpleService extends DomainService {
   }
 
 
-  override def cancel(confirmation: Confirmation): DomainContext => Try[Event] = context => {
-
+  override def cancel(confirmation: Confirmation): DomainContext => Option[Event] =
+    context => {
     val item = confirmation.scheduleItem
     val event = item.event
 
     val oldLocation = item.location
-    val interval = item.interval
+    val interval = new Interval(item.time, event.duration)
 
-    val updatedLocation = oldLocation.copy(
-        books =
-          oldLocation.books filterNot (_ == Booking(interval, event))
-      )
-    for{ _ <- context.repository.locationDAO.store(updatedLocation)
-         e = event.copy(status = Cancelled) } yield e
+    item.copy(location =
+      oldLocation.copy(
+        bookings = oldLocation.bookings filterNot (_ == Booking(interval, event))
+      ))
+    Option(event.copy(status = Cancelled))
   }
 
 
@@ -55,4 +65,5 @@ class SimpleService extends DomainService {
 
   override def possibleParticipantsInEvent(event: Event): DomainContext => Seq[Person] = ???
 
+  override def createEvent(organizer: Person, title: String, theme: String, organizerCost: Money, duration: JodaDuration, scheduleWindow: JodaDuration): (DomainContext) => Try[Event] = ???
 }

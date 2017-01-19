@@ -3,7 +3,6 @@ package shareevent
 import org.joda.time.DateTime
 import shareevent.model.{Location, Person}
 
-import scala.concurrent.Future
 import scala.util.Try
 
 
@@ -21,23 +20,24 @@ trait DomainContext {
 
     def deleteParticipant(login:String): Try[Boolean]
 
-    trait DAO[K,T] {
+    def retrieveDao[K, T](): DAO[K,T]
+
+    trait DAO[K, T] {
 
       def store(obj: T): Try[T]
 
       def retrieve(key: K): Try[Option[T]]
 
       def delete(key: K): Try[Boolean]
+
+      def merge(instance: T): Try[T]
     }
 
-    val locationDAO : DAO[Long,Location]
-
+    lazy val locationDAO: DAO[Long, Location] = retrieveDao[Long, Location]()
   }
 
   val repository: Repository
 
   def currentTime: DateTime
-
-
 
 }

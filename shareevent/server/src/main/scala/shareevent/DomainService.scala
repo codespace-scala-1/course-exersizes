@@ -3,7 +3,6 @@ package shareevent
 import org.joda.time.{DateTime, Duration => JodaDuration}
 import shareevent.model._
 
-import scala.concurrent.duration.Duration
 import scala.util.Try
 
 trait DomainService {
@@ -40,7 +39,7 @@ trait DomainService {
 
   def generalConfirm(scheduleItem: ScheduleItem): DomainContext => Confirmation
 
-  def cancel(confirmation: Confirmation): DomainContext => Try[Event]
+  def cancel(confirmation: Confirmation): DomainContext => Option[Event]
 
   def run(confirmation: Confirmation): DomainContext => Event
 

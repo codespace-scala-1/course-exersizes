@@ -3,7 +3,9 @@ package shareevent.model
 
 object Role extends Enumeration
 {
-  val Organizer,Participant = Value
+  type Role = Value
+  val Organizer = Value("Organizer")
+  val Participant = Value("Participant")
 }
 
 case class Person (

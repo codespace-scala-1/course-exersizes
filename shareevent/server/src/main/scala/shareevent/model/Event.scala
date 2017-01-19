@@ -10,17 +10,17 @@ case class Event(
                 status: EventStatus,
                 created: DateTime,
                 duration: JodaDuration,
-                scheduleWindow: JodaDuration
-                )
+                scheduleWindow: JodaDuration,
+                minQuantityParticipants: Int = 5
+                ) {
+  val minParticipantsQuantity: Int = minQuantityParticipants
+}
 
 case class ScheduleItem(event: Event,
                         location: Location,
                         time: DateTime,
-                        participants: Seq[Person])
-{
-
-  lazy val interval = new Interval(time,event.duration)
-
+                        participants: Seq[Person]) {
+  lazy val interval = new Interval(time, event.duration)
 }
 
 case class Confirmation(scheduleItem: ScheduleItem)

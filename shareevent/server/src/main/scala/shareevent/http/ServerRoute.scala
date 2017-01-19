@@ -59,11 +59,20 @@ class ServerRoute(implicit actorSystem: ActorSystem,
                _ <- context.repository.storeParticipant(participant)
           } yield participant
 
-            /*
-          for { op <- context.repository.retrieveParticipant(participant.login)
-                t <- op.toLeft({context.repository.storeParticipant(participant: Person) map (_ => participant)})
-          } yield t
-          */
+
+        /*
+  for { op <- context.repository.retrieveParticipant(participant.login)
+        t <- op.toLeft(context.repository.storeParticipant(participant: Person) map (_ => participant))
+                  .fold(left => Failure(new Exception(s"Participant already exists")), identity)
+    }  yield t
+    */
+
+
+        /*
+      for { op <- context.repository.retrieveParticipant(participant.login)
+            t <- op.toLeft({context.repository.storeParticipant(participant: Person) map (_ => participant)})
+      } yield t
+      */
 
         // TODO:  rewrite use idiomatic loops.
         /*
