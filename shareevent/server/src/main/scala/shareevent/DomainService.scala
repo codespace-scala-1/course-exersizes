@@ -8,8 +8,6 @@ import scala.util.Try
 trait DomainService {
 
 
-
-
   def createEvent(organizer: Person,
                   title: String,
                   theme: String,

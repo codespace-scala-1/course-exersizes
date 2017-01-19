@@ -10,6 +10,8 @@ class InMemoryContext extends DomainContext {
 
   class InMemoryRepo extends Repository {
 
+
+
     private var participants = Set[Participant]()
 
     def storeParticipant(participant: Participant): Try[Unit] = {

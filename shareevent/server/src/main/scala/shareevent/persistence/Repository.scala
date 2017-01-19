@@ -1,0 +1,6 @@
+package persistence
+
+trait Repository
+{
+
+}
