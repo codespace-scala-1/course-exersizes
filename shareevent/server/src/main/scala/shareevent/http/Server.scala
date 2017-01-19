@@ -3,6 +3,7 @@ package shareevent.http
 import shareevent._
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.Http.ServerBinding
 import akka.stream.ActorMaterializer
 import shareevent.DomainService
 import shareevent.persistence.inmem.InMemoryContext
@@ -17,5 +18,12 @@ object Server extends App {
 
   val route = new ServerRoute().route
 
-  Http().bindAndHandle(route, "0.0.0.0", 8080)
+  val binding = Http().bindAndHandle(route, "0.0.0.0", 8080)
+
+  System.out.println("Server online at http://localhost:8080/\nPress RETURN to stop...");
+  System.in.read(); // let it run until user presses return
+
+  binding
+    .flatMap(_.unbind()) // trigger unbinding from the port
+    .onComplete(_ => actorSystem.terminate()) // and shutdown when done
 }

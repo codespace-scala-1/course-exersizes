@@ -26,6 +26,7 @@ lazy val server = (project in file("server"))
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
       "org.json4s" %% "json4s-native" % "3.5.0",
+      "org.json4s" %% "json4s-ext" % "3.5.0",
       "de.heikoseeberger" %% "akka-http-json4s" % "1.11.0"
     )
   )
@@ -34,6 +35,5 @@ lazy val clientParticipant = (project in file("client-participant")).settings(co
 
 lazy val clientOrganizer = (project in file("client-organizer")).settings(commonSettings: _*)
 
-lazy val root = (project in file(".")).
-  aggregate(commons,server,clientParticipant,clientOrganizer)
-
+lazy val root = Project(id = "shareevent", base = file("."), aggregate =
+  Seq(commons,server,clientParticipant,clientOrganizer))

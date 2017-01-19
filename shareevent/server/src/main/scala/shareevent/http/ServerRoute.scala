@@ -6,8 +6,9 @@ import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.{BasicHttpCredentials, HttpChallenge}
 import akka.http.scaladsl.server.Directives._
 import akka.stream.Materializer
-import org.json4s.NoTypeHints
-import shareevent.model.Person
+import org.json4s.JsonAST.JInt
+import shareevent.model.{Person, Role}
+import shareevent.model.Role.Role
 import shareevent.{DomainContext, DomainService}
 
 import scala.util.Try
@@ -15,6 +16,11 @@ import scala.util.Try
 import de.heikoseeberger.akkahttpjson4s.Json4sSupport
 import org.json4s.native.Serialization
 import org.json4s.native.Serialization.write
+import org.json4s.native.JsonMethods._
+import org.json4s.ext.EnumSerializer
+import org.json4s.JsonAST.{JField, JObject, JString, JValue}
+import org.json4s.{CustomSerializer, Extraction, NoTypeHints}
+
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -25,7 +31,18 @@ class ServerRoute(implicit actorSystem: ActorSystem,
                   execCtx: ExecutionContext,
                   context: DomainContext,
                   service: DomainService) extends Json4sSupport {
-  implicit val formats = Serialization.formats(NoTypeHints)
+  //important: both formats and serialization implicits need to be in scope
+  val defaultFormats = Serialization.formats(NoTypeHints) + new EnumSerializer(Role)
+  val personFormats = new CustomSerializer[Person](formats => (
+    { case p: JObject =>
+      implicit val formats = defaultFormats
+      val pWithRole = p merge JObject(JField("role", JInt(Role.Participant.id)) :: Nil) //TODO: what happens if JObject already contains role
+      pWithRole.extract[Person]
+    },
+    PartialFunction.empty
+    ))
+
+  implicit val formats = defaultFormats + personFormats
   implicit val serialization = Serialization
   private val challenge = HttpChallenge("Basic", "realm")
 
@@ -51,8 +68,6 @@ class ServerRoute(implicit actorSystem: ActorSystem,
     path("participant") {
       //TODO:  serialize person without role
       (post & entity(as[Person])) { participant =>
-
-
         val storeResult:Try[Person] =
           for {op <- context.repository.personDAO.retrieve(participant.login)
                _ <- op.map(p => new IllegalArgumentException("participant already exists")).toLeft[Unit](()).toTry
