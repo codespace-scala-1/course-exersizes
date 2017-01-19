@@ -101,7 +101,7 @@ class ServerRoute(implicit actorSystem: ActorSystem,
         */
 
         onComplete(Future.fromTry(storeResult)) {
-          case Success(entity) => complete(OK -> write(entity))
+          case Success(entity) => complete(OK -> entity)
           case Failure(ex)    => complete(Conflict -> ex.getMessage)
         }
       } ~
