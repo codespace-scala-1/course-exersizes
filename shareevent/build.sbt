@@ -6,6 +6,7 @@ lazy val commonSettings = Seq(
                          /*,   "-Ydebug"  ,  "-Ylog:lambdalift"  */
                      ),
   libraryDependencies ++= Seq (
+    scalaVersion( "org.scala-lang" % "scala-reflect" % _ ).value,
     "org.scalatest" %% "scalatest" % "3.0.1" % Test,
     "com.github.nscala-time" %% "nscala-time" % "2.16.0",
     "com.chuusai" %% "shapeless" % "2.3.2"
