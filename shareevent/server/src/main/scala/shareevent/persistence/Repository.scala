@@ -8,15 +8,10 @@ trait Repository
 {
   import Repository._
 
-  //TODO: refactor
-  def storeParticipant(p: Person): Try[Unit]
-
-  //TODO: refactor
-  def retrieveParticipant(login: String): Try[Option[Person]]
-
-  def deleteParticipant(login:String): Try[Boolean]
 
   //def retrieveDao[K, T](): DAO[K,T]
+
+  val personDAO: DAO[String,Person]
 
   val locationDAO:  DAO[Long,Location]
 

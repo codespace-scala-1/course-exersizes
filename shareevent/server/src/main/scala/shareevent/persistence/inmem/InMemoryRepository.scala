@@ -13,24 +13,39 @@ class InMemoryContext extends DomainContext {
 
     import shareevent.persistence.Repository._
 
-    private var participants = Set[Person]()
+    override val personDAO: DAO[String,Person] = new DAO[String,Person] {
 
-    def storeParticipant(participant: Person): Try[Unit] = {
-      participants = participants + participant
-      Success(())
-    }
+      private var participants = Map[String,Person]()
 
-    def retrieveParticipant(login: String): Try[Option[Person]] =
-      Try(participants.find(_.login == login))
-
-    def deleteParticipant(login: String): Try[Boolean] = {
-      for {op <- retrieveParticipant(login) } yield {
-        op.foreach{ p =>
-          participants = participants - p
-        }
-        op.isDefined
+      def store(obj: Person): Try[Person] =
+      {
+        participants = participants.updated(obj.login,obj)
+        Success(obj)
       }
+
+      def retrieve(key: String): Try[Option[Person]] =
+      {
+        Success(participants.get(key))
+      }
+
+      def delete(key: String): Try[Boolean] =
+      {
+        val oldParticipants = participants
+        participants = participants - key
+        Success(participants.size != oldParticipants.size)
+      }
+
+      def merge(instance: Person): Try[Person] =
+      {
+        val r = participants.get(instance.login) map { p =>
+          participants = participants.updated(instance.login,instance)
+          instance
+        }
+        r.toRight(new IllegalArgumentException(s"instance ${instance.login} is not in our collection")).toTry
+      }
+
     }
+
 
     override lazy val locationDAO: DAO[Long, Location] = ???
 

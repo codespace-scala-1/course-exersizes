@@ -31,7 +31,7 @@ class ServerRoute(implicit actorSystem: ActorSystem,
 
   def authenticated(login: String, password: String): Boolean = {
 
-    context.repository.retrieveParticipant(login) match {
+    context.repository.personDAO.retrieve(login) match {
       case Success(Some(participant)) => participant.password == password
       case _ => false
     }
@@ -54,10 +54,10 @@ class ServerRoute(implicit actorSystem: ActorSystem,
 
 
         val storeResult:Try[Person] =
-          for {op <- context.repository.retrieveParticipant(participant.login)
+          for {op <- context.repository.personDAO.retrieve(participant.login)
                _ <- op.map(p => new IllegalArgumentException("participant already exists")).toLeft[Unit](()).toTry
-               _ <- context.repository.storeParticipant(participant)
-          } yield participant
+               stored <- context.repository.personDAO.store(participant)
+          } yield stored
 
 
         /*
@@ -98,7 +98,7 @@ class ServerRoute(implicit actorSystem: ActorSystem,
               complete(Conflict -> "Not authorized to delete other participant")
             }
             else {
-              context.repository.deleteParticipant(login) match {
+              context.repository.personDAO.retrieve(login) match {
                 case Success(_) => complete(OK -> "DONE")
                 case Failure(ex) => complete(Conflict -> ex.getMessage)
               }
