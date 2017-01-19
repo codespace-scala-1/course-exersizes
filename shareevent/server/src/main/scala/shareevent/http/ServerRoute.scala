@@ -52,10 +52,18 @@ class ServerRoute(implicit actorSystem: ActorSystem,
       //TODO:  serialize person without role
       (post & entity(as[Person])) { participant =>
 
+
         val storeResult:Try[Person] =
+          for {op <- context.repository.retrieveParticipant(participant.login)
+               _ <- op.map(p => new IllegalArgumentException("participant already exists")).toLeft[Unit](()).toTry
+               _ <- context.repository.storeParticipant(participant)
+          } yield participant
+
+            /*
           for { op <- context.repository.retrieveParticipant(participant.login)
                 t <- op.toLeft({context.repository.storeParticipant(participant: Person) map (_ => participant)})
           } yield t
+          */
 
         // TODO:  rewrite use idiomatic loops.
         /*

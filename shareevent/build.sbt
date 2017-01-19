@@ -7,9 +7,11 @@ lazy val commonSettings = Seq(
                      ),
   libraryDependencies ++= Seq (
     "org.scalatest" %% "scalatest" % "3.0.1" % Test,
-    "com.github.nscala-time" %% "nscala-time" % "2.16.0"
+    "com.github.nscala-time" %% "nscala-time" % "2.16.0",
+    "com.chuusai" %% "shapeless" % "2.3.2"
   )
 )
+
 
 val akkaVersion = "2.4.16"
 val akkaHttpVersion = "10.0.1"

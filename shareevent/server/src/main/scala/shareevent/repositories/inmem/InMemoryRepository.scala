@@ -1,6 +1,7 @@
-package shareevent
+package shareevent.repositories.inmem
 
 import org.joda.time.DateTime
+import shareevent.DomainContext
 import shareevent.model.Location
 
 import scala.util.{Success, Try}

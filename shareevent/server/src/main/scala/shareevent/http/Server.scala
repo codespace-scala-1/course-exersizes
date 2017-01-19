@@ -1,11 +1,11 @@
 package shareevent.http
 
 import shareevent._
-
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
-import shareevent.{DomainService, InMemoryContext}
+import shareevent.DomainService
+import shareevent.repositories.inmem.InMemoryContext
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
