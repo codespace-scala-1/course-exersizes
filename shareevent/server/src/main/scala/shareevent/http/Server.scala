@@ -5,7 +5,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import shareevent.DomainService
-import shareevent.repositories.inmem.InMemoryContext
+import shareevent.persistence.inmem.InMemoryContext
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

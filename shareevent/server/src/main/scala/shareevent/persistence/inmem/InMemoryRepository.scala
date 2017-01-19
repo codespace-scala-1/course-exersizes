@@ -1,4 +1,4 @@
-package shareevent.repositories.inmem
+package shareevent.persistence.inmem
 
 import org.joda.time.DateTime
 import shareevent.DomainContext
