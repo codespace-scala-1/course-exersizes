@@ -16,7 +16,9 @@ case class Booking(time: Interval,
                     event: Event,
                     status: BookingStatus = BookingStatus.Preliminary)
 
-case class Location(name:  String,
+case class Location(
+                     id: Option[Long],
+                     name:  String,
                      capacity:  Int,
                      coordinate: Coordinate,
                      bookings: Seq[Booking] = Seq())

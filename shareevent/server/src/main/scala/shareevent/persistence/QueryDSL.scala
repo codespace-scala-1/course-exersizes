@@ -9,7 +9,7 @@ import shapeless.Poly
 
 object QueryDSL {
 
-  case class ObjectMeta[T,This<:ObjectMeta[T,This]](val metaTableName:String)
+  class ObjectMeta[T,This<:ObjectMeta[T,This]](val metaTableName:String)
   {
     def select = new TableSelectionExpression[This]
 
@@ -18,7 +18,7 @@ object QueryDSL {
 
   }
 
-  case class ObjectFieldMeta[O,T,OM <: ObjectMeta[O,OM]](
+  class ObjectFieldMeta[O,T,OM <: ObjectMeta[O,OM]](
                                  val isId: Boolean,
                                  val name: String,
                                  val optional: Boolean,
@@ -31,6 +31,8 @@ object QueryDSL {
 
     def !== (other: FieldExpersion[T]) = NonEquals(this,other)
     def isNil = IsNil(this)
+
+    override def toString = s"field(${name})"
   }
 
 

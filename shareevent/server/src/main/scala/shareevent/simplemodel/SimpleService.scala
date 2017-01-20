@@ -12,50 +12,73 @@ class SimpleService extends DomainService {
 
   def createEvent(organizer: Person, title: String, theme: String, organizerCost: Money, duration: JodaDuration,
                   scheduleWindow: JodaDuration, quantityOfParticipants: Int): DomainContext => Try[Event] = {
-
-    require(organizer.role == Role.Organizer)
-
-    val eventTry = Try {
-      Event(title, theme, organizer, organizerCost, Initial, DateTime.now(), duration, scheduleWindow)
+  ctx =>
+    Try {
+      require(organizer.role == Role.Organizer)
+      Event(
+        None,
+        title = title,
+        theme = theme,
+        organizer = organizer,
+        organizerCost = organizerCost,
+        status = EventStatus.Initial,
+        created = ctx.currentTime,
+        duration = duration,
+        scheduleWindow = scheduleWindow,
+        minQuantityParticipants = quantityOfParticipants)
+    } flatMap {
+       ctx.repository.eventsDAO.store(_)
     }
-
-    eventTry.foreach(evt => require(quantityOfParticipants >= evt.minParticipantsQuantity))
-    _ => eventTry
   }
 
   override def createLocation(name: String, capacity: Int, startSchedule: DateTime, endSchedule: DateTime, coordinate: Coordinate,
-                              costs: Money): DomainContext => Try[Location] = {_ => Try(Location(name, capacity, coordinate, Seq.empty))}
+                              costs: Money): DomainContext => Try[Location] = { ctx =>
+      // TODO: add check that capacity > 0
+      ctx.repository.locationDAO.store(
+        Location(None, name, capacity, coordinate, Seq.empty)
+      )
+  }
 
   /**
     * If participant is interested in event, he can participate
     * in scheduling of one.
     */
-  override def participantInterest(event: Event, participant: Person): (DomainContext) => Try[Boolean] = ???
+  override def participantInterest(event: Event, participant: Person): (DomainContext) => Try[Boolean] = _ => Success(true)
 
-  override def schedule(event: Event, location: Location, time: DateTime): DomainContext => Try[ScheduleItem] = {
-    _ => Try(ScheduleItem(event, location, time, Seq.empty))
+  override def schedule(event: Event, locationId: Long, time: DateTime): DomainContext => Try[ScheduleItem] = {
+
+    _ => Try(ScheduleItem(event, locationId, time, Seq.empty))
   }
 
-  override def locationConfirm(scheduleItem: ScheduleItem): DomainContext => Try[ScheduleItem] = ???
+  override def locationConfirm(scheduleItem: ScheduleItem): DomainContext => Try[ScheduleItem] = {
+    //ctx =>
+      //scheduleItem.location
+    ???
+  }
 
   override def generalConfirm(scheduleItem: ScheduleItem): DomainContext => Confirmation = {
     _ => Confirmation(scheduleItem)
   }
 
 
-  override def cancel(confirmation: Confirmation): DomainContext => Option[Event] =
+  override def cancel(confirmation: Confirmation): DomainContext => Try[Event] =
+
     context => {
-    val item = confirmation.scheduleItem
-    val event = item.event
 
-    val oldLocation = item.location
-    val interval = new Interval(item.time, event.duration)
+      val item = confirmation.scheduleItem
+      val event = item.event
+      val interval = new Interval(item.time, event.duration)
 
-    item.copy(location =
-      oldLocation.copy(
-        bookings = oldLocation.bookings filterNot (_ == Booking(interval, event))
-      ))
-    Option(event.copy(status = Cancelled))
+      for {optLocation <- context.repository.locationDAO.retrieve(item.locationId)
+           location <- optLocation.toRight(new Exception("Can't find location")).toTry
+           changed = location.copy(bookings = location.bookings.filterNot( _ == Booking(interval,event)))
+           savedLocation = context.repository.locationDAO.merge(changed)
+           cancelledEvent = event.copy(status = EventStatus.Cancelled)
+           savedCancelledEvent <- context.repository.eventsDAO.merge(cancelledEvent)
+      } yield {
+        savedCancelledEvent
+      }
+
   }
 
 
@@ -65,5 +88,6 @@ class SimpleService extends DomainService {
 
   override def possibleParticipantsInEvent(event: Event): DomainContext => Seq[Person] = ???
 
-  override def createEvent(organizer: Person, title: String, theme: String, organizerCost: Money, duration: JodaDuration, scheduleWindow: JodaDuration): (DomainContext) => Try[Event] = ???
+
+
 }

@@ -2,7 +2,7 @@ package shareevent.persistence.inmem
 
 import org.joda.time.DateTime
 import shareevent.DomainContext
-import shareevent.model.{Location, Person}
+import shareevent.model.{Event, Location, Person}
 import shareevent.persistence.Repository
 
 import scala.util.{Success, Try}
@@ -48,6 +48,8 @@ class InMemoryContext extends DomainContext {
 
 
     override lazy val locationDAO: DAO[Long, Location] = ???
+
+    override lazy val eventsDAO: DAO[Long, Event ] = ???
 
     //override def retrieveDao[K, T](): DAO[K, T] = ???
   }

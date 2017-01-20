@@ -33,6 +33,7 @@ trait Repository
   val locationDAO:  DAO[Long,Location]
 
 
+  val eventsDAO: DAO[Long,Event]
 
 
 }

@@ -74,32 +74,6 @@ class ServerRoute(implicit actorSystem: ActorSystem,
                stored <- context.repository.personDAO.store(participant)
           } yield stored
 
-
-        /*
-  for { op <- context.repository.retrieveParticipant(participant.login)
-        t <- op.toLeft(context.repository.storeParticipant(participant: Person) map (_ => participant))
-                  .fold(left => Failure(new Exception(s"Participant already exists")), identity)
-    }  yield t
-    */
-
-
-        /*
-      for { op <- context.repository.retrieveParticipant(participant.login)
-            t <- op.toLeft({context.repository.storeParticipant(participant: Person) map (_ => participant)})
-      } yield t
-      */
-
-        // TODO:  rewrite use idiomatic loops.
-        /*
-        val storeResult:Try[Person] = context.repository.retrieveParticipant(participant.login) flatMap { maybeExisting =>
-          if (maybeExisting.isDefined) {
-              Failure(new Exception(s"participant already exists"))
-          } else {
-              context.repository.storeParticipant(participant) map (_ => participant)
-          }
-        }
-        */
-
         onComplete(Future.fromTry(storeResult)) {
           case Success(entity) => complete(OK -> write(entity))
           case Failure(ex)    => complete(Conflict -> ex.getMessage)

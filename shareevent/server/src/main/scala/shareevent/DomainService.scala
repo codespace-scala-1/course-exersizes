@@ -13,7 +13,8 @@ trait DomainService {
                   theme: String,
                   organizerCost: Money = Money.zero,
                   duration: JodaDuration = JodaDuration.standardHours(2),
-                  scheduleWindow: JodaDuration = JodaDuration.standardDays(14)
+                  scheduleWindow: JodaDuration = JodaDuration.standardDays(14),
+                  quantityOfParticipants: Int = 5
                  ): DomainContext => Try[Event]
 
 
@@ -31,13 +32,13 @@ trait DomainService {
     */
   def participantInterest(event:Event, participant: Person): (DomainContext) => Try[Boolean]
 
-  def schedule(event: Event, location: Location, time: DateTime): DomainContext => Try[ScheduleItem]
+  def schedule(event: Event, locationId: Long, time: DateTime): DomainContext => Try[ScheduleItem]
 
   def locationConfirm(scheduleItem: ScheduleItem): DomainContext => Try[ScheduleItem]
 
   def generalConfirm(scheduleItem: ScheduleItem): DomainContext => Confirmation
 
-  def cancel(confirmation: Confirmation): DomainContext => Option[Event]
+  def cancel(confirmation: Confirmation): DomainContext => Try[Event]
 
   def run(confirmation: Confirmation): DomainContext => Event
 
