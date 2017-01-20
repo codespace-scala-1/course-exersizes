@@ -17,8 +17,9 @@ case class Booking(time: Interval,
                     status: BookingStatus = BookingStatus.Preliminary)
 
 case class Location(
-                     id: Option[Long],
+                     id: OptionId[Long,Location],
                      name:  String,
                      capacity:  Int,
                      coordinate: Coordinate,
-                     bookings: Seq[Booking] = Seq())
+                     bookings: Seq[Booking] = Seq()
+                   )

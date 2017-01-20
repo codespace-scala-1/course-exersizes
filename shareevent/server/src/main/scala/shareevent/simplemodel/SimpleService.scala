@@ -16,7 +16,7 @@ class SimpleService extends DomainService {
     Try {
       require(organizer.role == Role.Organizer)
       Event(
-        None,
+        NoId,
         title = title,
         theme = theme,
         organizer = organizer,
@@ -35,7 +35,7 @@ class SimpleService extends DomainService {
                               costs: Money): DomainContext => Try[Location] = { ctx =>
       // TODO: add check that capacity > 0
       ctx.repository.locationDAO.store(
-        Location(None, name, capacity, coordinate, Seq.empty)
+        Location(NoId, name, capacity, coordinate, Seq.empty)
       )
   }
 
@@ -45,7 +45,7 @@ class SimpleService extends DomainService {
     */
   override def participantInterest(event: Event, participant: Person): (DomainContext) => Try[Boolean] = _ => Success(true)
 
-  override def schedule(event: Event, locationId: Long, time: DateTime): DomainContext => Try[ScheduleItem] = {
+  override def schedule(event: Event, locationId: Id[Long,Location], time: DateTime): DomainContext => Try[ScheduleItem] = {
 
     _ => Try(ScheduleItem(event, locationId, time, Seq.empty))
   }
@@ -69,7 +69,7 @@ class SimpleService extends DomainService {
       val event = item.event
       val interval = new Interval(item.time, event.duration)
 
-      for {optLocation <- context.repository.locationDAO.retrieve(item.locationId)
+      for {optLocation <- context.repository.locationDAO.retrieve(item.locationId.id)
            location <- optLocation.toRight(new Exception("Can't find location")).toTry
            changed = location.copy(bookings = location.bookings.filterNot( _ == Booking(interval,event)))
            savedLocation = context.repository.locationDAO.merge(changed)
