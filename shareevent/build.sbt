@@ -25,6 +25,7 @@ lazy val server = (project in file("server"))
     resolvers += Resolver.bintrayRepo("hseeberger", "maven"),
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
+      "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test,
       "org.json4s" %% "json4s-native" % "3.5.0",
       "org.json4s" %% "json4s-ext" % "3.5.0",
       "de.heikoseeberger" %% "akka-http-json4s" % "1.11.0"
