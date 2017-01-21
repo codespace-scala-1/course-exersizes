@@ -18,6 +18,7 @@ import org.json4s.ext.EnumSerializer
 import org.json4s.native.Serialization
 import org.json4s.native.JsonMethods._
 
+import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.util.Success
 import scala.language.postfixOps
@@ -54,8 +55,15 @@ class RegisterParticipantTest extends WordSpec with Matchers with ScalatestRoute
       Post("/participant", personJs) ~> route ~> check {
         response.status shouldEqual StatusCodes.Conflict
 
-        for(s <- response.entity.toStrict(1 second).map(_.data.decodeString("UTF-8")))
-         s should include("participant already exists")
+
+        val f = response.entity.toStrict(1 second).map(_.data.decodeString("UTF-8"))
+
+
+        val s = Await.result(f, 1 second)
+
+        s should include("participant already exists")
+
+
       }
     }
 
