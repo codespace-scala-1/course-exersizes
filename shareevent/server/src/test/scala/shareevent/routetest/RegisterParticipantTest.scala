@@ -18,6 +18,9 @@ import org.json4s.ext.EnumSerializer
 import org.json4s.native.Serialization
 import org.json4s.native.JsonMethods._
 
+import scala.concurrent.duration._
+import scala.util.Success
+
 class RegisterParticipantTest extends WordSpec with Matchers with ScalatestRouteTest with Json4sSupport {
   //implicit val actorSystem = ActorSystem()
   //implicit val materializer = ActorMaterializer()
@@ -42,5 +45,26 @@ class RegisterParticipantTest extends WordSpec with Matchers with ScalatestRoute
         jsResponse \ "role" shouldEqual JInt(Role.Participant.id)
       }
     }
+
+    "second registration attempt should fail" in {
+
+      val personJs: JValue = ("login" -> "yar") ~ ("password" -> "test")
+
+      Post("/participant", personJs) ~> route ~> check {
+        response.status shouldEqual StatusCodes.Conflict
+
+        for(s <- response.entity.toStrict(1 second).map(_.data.decodeString("UTF-8")))
+         s should include("participant already exists")
+      }
+    }
+
+    "deletion of participant should succeed" in {
+
+      //addCredentials(BasicHttpCredentials("yar", "test"))
+      Delete("/participant?login=yar") ~> route ~> check {
+        response.status shouldEqual StatusCodes.OK
+      }
+    }
   }
+
 }
