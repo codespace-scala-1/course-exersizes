@@ -6,6 +6,10 @@ import shareevent.model._
 
 import scala.util.{Failure, Success, Try}
 import org.joda.time.Interval
+import shareevent.persistence.QueryDSL
+import shareevent.persistence.Repository.Objects.location
+
+import QueryDSL._
 
 class SimpleService extends DomainService {
 
@@ -111,7 +115,23 @@ class SimpleService extends DomainService {
 
   override def possibleParticipantsInEvent(event: Event): DomainContext => Seq[Person] = ???
 
-  def possibleTimesForLocation(l:Location)(implicit ctx:DomainContext):Seq[DateTime] = ???
-
-
+  def possibleTimesForLocation(l:Location)(implicit ctx:DomainContext):Seq[DateTime] = {
+    l.id match {
+      case Some(x) => ctx.repository.locationDAO.retrieve(x.id) match {
+        case Success(v) => v match {
+          case Some(location) =>
+            val gaps = for {
+              booking <- location.bookings
+              interval = booking.time
+              booking2 <- location.bookings if booking2 != booking
+              gap = interval.gap(booking2.time)
+            } yield gap
+            gaps.distinct.map(g => g.getStart)
+          case None => Seq()
+        }
+        case Failure(e) => Seq()
+      }
+      case None => Seq()
+    }
+  }
 }
