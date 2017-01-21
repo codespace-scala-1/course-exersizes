@@ -130,9 +130,8 @@ class SimpleService extends DomainService {
           case Some(location) =>
             val gaps = for {
               booking <- location.bookings
-              interval = booking.time
               booking2 <- location.bookings if booking2 != booking
-              gap = interval.gap(booking2.time)
+              gap = booking.time.gap(booking2.time)
             } yield gap
             gaps.distinct.map(g => g.getStart)
           case None => Seq()
