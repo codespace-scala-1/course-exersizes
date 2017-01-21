@@ -11,7 +11,10 @@ class OverallFlowTest extends FunSpec {
 
 
 
-  def bestScheduleLocations(scheduleItems: Seq[ScheduleItem]): DomainContext => Try[ScheduleItem] = ???
+  def bestScheduleLocations(scheduleItems: Seq[ScheduleItem]): DomainContext => Try[ScheduleItem] =
+  {
+    
+  }
 
   def runEvent(service:DomainService)(organizer: Person, title: String): DomainContext => Try[ScheduleItem] =
     ctx => {
