@@ -13,13 +13,20 @@ case object BookingStatus {
 }
 
 case class Booking(time: Interval,
-                    event: Event,
+                    eventId: Event.Id,
                     status: BookingStatus = BookingStatus.Preliminary)
 
 case class Location(
-                     id: OptionId[Long,Location],
+                     id: Option[Location.Id],
                      name:  String,
                      capacity:  Int,
                      coordinate: Coordinate,
                      bookings: Seq[Booking] = Seq()
                    )
+
+object Location
+{
+
+  type Id = PersistenceId[Long,Location]
+
+}

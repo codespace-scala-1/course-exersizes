@@ -17,3 +17,7 @@ case class Person (
                     phoneNo: Option[String] = None
                   )
 
+object Person
+{
+  type Id = String
+}

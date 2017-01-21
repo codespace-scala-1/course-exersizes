@@ -32,6 +32,9 @@ object QueryDSL {
     def !== (other: FieldExpersion[T]) = NonEquals(this,other)
     def isNil = IsNil(this)
 
+    def <= (other: FieldExpersion[T])(implicit o: Ordering[T]) = LessEq(this,other)
+    def >= (other: FieldExpersion[T])(implicit o: Ordering[T]) = GreaterEq(this,other)
+
     override def toString = s"field(${name})"
   }
 
@@ -77,6 +80,11 @@ object QueryDSL {
   case class Equals[T](x:FieldExpersion[T],y:FieldExpersion[T]) extends FieldComparison
 
   case class NonEquals[T](x:FieldExpersion[T],y:FieldExpersion[T]) extends FieldComparison
+
+  case class LessEq[T](x:FieldExpersion[T],y:FieldExpersion[T])(implicit o:Ordering[T]) extends FieldComparison
+
+  case class GreaterEq[T](x:FieldExpersion[T],y:FieldExpersion[T])(implicit o:Ordering[T]) extends FieldComparison
+
 
   case class IsNil[T](x:FieldExpersion[T]) extends BooleanExpression
 

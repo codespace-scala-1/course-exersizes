@@ -3,26 +3,29 @@ package shareevent.model
 import org.joda.time.{DateTime, Interval, Duration => JodaDuration}
 
 case class Event(
-                id: OptionId[Long,Event],
-                title: String,
-                theme: String,
-                organizer: Person,
-                organizerCost: Money,
-                status: EventStatus,
-                created: DateTime,
-                duration: JodaDuration,
-                scheduleWindow: JodaDuration,
-                minQuantityParticipants: Int = 5
+                  id: Option[Event.Id],
+                  title: String,
+                  theme: String,
+                  organizer: Person,
+                  organizerCost: Money,
+                  status: EventStatus,
+                  created: DateTime,
+                  duration: JodaDuration,
+                  scheduleWindow: JodaDuration,
+                  minParticipantsQuantity: Int = 5
                 ) {
-  val minParticipantsQuantity: Int = minQuantityParticipants
+}
+
+object Event
+{
+  type Id = PersistenceId[Long,Event]
 }
 
 
-case class ScheduleItem(event: Event,
-                        locationId: Id[Long,Location],
+case class ScheduleItem(eventId: Event.Id,
+                        locationId: Location.Id,
                         time: DateTime,
-                        participants: Seq[Person]) {
-  lazy val interval = new Interval(time, event.duration)
+                        participants: Seq[Person.Id]) {
 }
 
 case class Confirmation(scheduleItem: ScheduleItem)

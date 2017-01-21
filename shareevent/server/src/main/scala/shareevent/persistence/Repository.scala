@@ -3,8 +3,9 @@ package shareevent.persistence
 import org.joda.time.Interval
 import shareevent.model.Role.Role
 import shareevent.model._
+import shareevent.persistence.QueryDSL.ObjectMeta
 
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 trait Repository
 {
@@ -13,11 +14,17 @@ trait Repository
 
   trait DAO[K, T] {
 
-    def query(q: QueryDSL.TableSelectionExpression[T]): Try[Seq[T]] = ???
+    def query[MT<:ObjectMeta[T,MT]](q: QueryDSL.QueryExpression[MT])(implicit mt:ObjectMeta[T,MT]): Try[Seq[T]] = ???
 
     def store(obj: T): Try[T]
 
     def retrieve(key: K): Try[Option[T]]
+
+    def retrieveExistent(key:K): Try[T] =
+      retrieve(key).flatMap{
+        case Some(o) => Success(o)
+        case None => Failure(new IllegalStateException("pk not found"))
+      }
 
     def delete(key: K): Try[Boolean]
 

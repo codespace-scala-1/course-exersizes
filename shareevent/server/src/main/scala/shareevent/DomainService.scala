@@ -32,7 +32,7 @@ trait DomainService {
     */
   def participantInterest(event:Event, participant: Person): (DomainContext) => Try[Boolean]
 
-  def schedule(event: Event, locationId: Id[Long,Location], time: DateTime): DomainContext => Try[ScheduleItem]
+  def schedule(eventId: Event.Id, locationId: PersistenceId[Long,Location], time: DateTime): DomainContext => Try[ScheduleItem]
 
   def locationConfirm(scheduleItem: ScheduleItem): DomainContext => Try[ScheduleItem]
 
@@ -42,7 +42,7 @@ trait DomainService {
 
   def run(confirmation: Confirmation): DomainContext => Event
 
-  def possibleLocationsForEvent(event:Event): DomainContext => Seq[ScheduleItem]
+  def possibleLocationsForEvent(event:Event): DomainContext => Try[Seq[ScheduleItem]]
 
   def possibleParticipantsInEvent(event: Event): DomainContext => Seq[Person]
 
