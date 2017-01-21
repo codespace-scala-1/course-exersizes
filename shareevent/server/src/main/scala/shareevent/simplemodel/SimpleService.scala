@@ -6,6 +6,10 @@ import shareevent.model._
 
 import scala.util.{Failure, Success, Try}
 import org.joda.time.Interval
+import shareevent.persistence.QueryDSL
+import shareevent.persistence.Repository.Objects.location
+
+import QueryDSL._
 
 class SimpleService extends DomainService {
 
@@ -51,7 +55,12 @@ class SimpleService extends DomainService {
   }
 
   override def locationConfirm(scheduleItem: ScheduleItem): DomainContext => Try[ScheduleItem] = {
-    //ctx =>
+    def isCrossTime(booking:Booking,time:DateTime): Boolean =
+    {
+        booking.time.contains(time)
+    }
+
+    //c§tx =>
       //scheduleItem.location
     ???
   }
@@ -96,16 +105,32 @@ class SimpleService extends DomainService {
   override def possibleLocationsForEvent(event: Event): DomainContext => Try[Seq[ScheduleItem]] =
   { implicit ctx =>
       import shareevent.persistence.Repository.Objects._
-      for {
+
+      def unwrapTry[T](x:Try[T]):T =
+        x match {
+          case Success(x) => x
+          case Failure(ex) => throw ex
+        }
+
+    def genSecheduleItems(eventId: Event.Id, locations:Seq[Location]):Try[Seq[ScheduleItem]] =
+      Try {
+        for {location <- locations
+             times = unwrapTry(possibleTimesForLocation(location))
+             time <- times
+        } yield {
+          ScheduleItem(eventId, location.id.get, time, Seq.empty)
+        }
+      }
+
+
+    for {
         eventId <- event.id.toTry
         locations <- ctx.repository.locationDAO.query(
           location.select where location.capacity >= event.minParticipantsQuantity
         )
+        scheduleItems <- genSecheduleItems(eventId,locations)
       } yield {
-         for{location <- locations
-             time <- possibleTimesForLocation(location) } yield {
-           ScheduleItem(eventId,location.id.get,time,Seq.empty)
-         }
+        scheduleItems
       }
   }
 
@@ -129,8 +154,39 @@ class SimpleService extends DomainService {
 
     }
 
+  def possibleTimesForLocation(l:Location)(implicit ctx:DomainContext):Try[Seq[DateTime]] = {
 
-  def possibleTimesForLocation(l:Location)(implicit ctx:DomainContext):Seq[DateTime] = ???
+    for {locationId <- l.id.toTry
+         location <- ctx.repository.locationDAO.retrieveExistent(locationId.id)
+         } yield {
+      val gaps = for {
+        booking <- location.bookings
+        booking2 <- location.bookings if booking2 != booking
+        gap = booking.time.gap(booking2.time)
+      } yield gap
+      gaps.distinct.map(g => g.getStart)
+    }
 
+    /*
+    // old variand without for comprehansion
+    l.id match {
+      case Some(x) => ctx.repository.locationDAO.retrieve(x.id) match {
+        case Success(v) => v match {
+          case Some(location) =>
+            val gaps = for {
+              booking <- location.bookings
+              booking2 <- location.bookings if booking2 != booking
+              gap = booking.time.gap(booking2.time)
+            } yield gap
+            gaps.distinct.map(g => g.getStart)
+          case None => Seq()
+        }
+        case Failure(e) => Seq()
+      }
+      case None => Seq()
+    }
+    */
+
+  }
 
 }
