@@ -23,18 +23,9 @@ import scala.concurrent.duration._
 import scala.util.Success
 import scala.language.postfixOps
 
-class RegisterParticipantTest extends WordSpec with Matchers with ScalatestRouteTest with Json4sSupport {
+class RegisterParticipantTest extends WordSpec with Matchers with ServerRouteTestCommons {
   //implicit val actorSystem = ActorSystem()
   //implicit val materializer = ActorMaterializer()
-  implicit val repository = new InMemoryContext()
-  implicit val service: DomainService = new simplemodel.SimpleService
-  val serverRoute = new ServerRoute()
-
-  implicit val formats = DefaultFormats
-  implicit val serialization = Serialization
-
-
-  val route = serverRoute.route
 
   "The service" should {
     "register a participant and return it back" in {
