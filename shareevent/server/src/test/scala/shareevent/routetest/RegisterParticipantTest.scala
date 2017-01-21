@@ -18,22 +18,14 @@ import org.json4s.ext.EnumSerializer
 import org.json4s.native.Serialization
 import org.json4s.native.JsonMethods._
 
+import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.util.Success
 import scala.language.postfixOps
 
-class RegisterParticipantTest extends WordSpec with Matchers with ScalatestRouteTest with Json4sSupport {
+class RegisterParticipantTest extends WordSpec with Matchers with ServerRouteTestCommons {
   //implicit val actorSystem = ActorSystem()
   //implicit val materializer = ActorMaterializer()
-  implicit val repository = new InMemoryContext()
-  implicit val service: DomainService = new simplemodel.SimpleService
-  val serverRoute = new ServerRoute()
-
-  implicit val formats = DefaultFormats
-  implicit val serialization = Serialization
-
-
-  val route = serverRoute.route
 
   "The service" should {
     "register a participant and return it back" in {
@@ -54,13 +46,20 @@ class RegisterParticipantTest extends WordSpec with Matchers with ScalatestRoute
       Post("/participant", personJs) ~> route ~> check {
         response.status shouldEqual StatusCodes.Conflict
 
-        for(s <- response.entity.toStrict(1 second).map(_.data.decodeString("UTF-8")))
-         s should include("participant already exists")
+
+        val f = response.entity.toStrict(1 second).map(_.data.decodeString("UTF-8"))
+
+
+        val s = Await.result(f, 1 second)
+
+        s should include("participant already exists")
+
+
       }
     }
 
     "deletion of participant should succeed" in {
-
+       pending
       //addCredentials(BasicHttpCredentials("yar", "test"))
       Delete("/participant?login=yar") ~> route ~> check {
         response.status shouldEqual StatusCodes.OK
