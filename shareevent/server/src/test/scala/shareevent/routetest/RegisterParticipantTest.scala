@@ -20,6 +20,7 @@ import org.json4s.native.JsonMethods._
 
 import scala.concurrent.duration._
 import scala.util.Success
+import scala.language.postfixOps
 
 class RegisterParticipantTest extends WordSpec with Matchers with ScalatestRouteTest with Json4sSupport {
   //implicit val actorSystem = ActorSystem()

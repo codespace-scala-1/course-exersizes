@@ -19,7 +19,7 @@ class SimpleService extends DomainService {
         None,
         title = title,
         theme = theme,
-        organizer = organizer,
+        organizer = OrganizerTag.tag(organizer),
         organizerCost = organizerCost,
         status = EventStatus.Initial,
         created = ctx.currentTime,
@@ -83,14 +83,24 @@ class SimpleService extends DomainService {
   }
 
 
-  override def run(confirmation: Confirmation): DomainContext => Event = ???
+  override def run(confirmation: Confirmation): DomainContext => Try[Event] =
+  ctx => {
+    for {event <- ctx.repository.eventsDAO.retrieveExistent(
+                              confirmation.scheduleItem.eventId.id)
+         changed = event.copy(status = EventStatus.Done)
+         saved <- ctx.repository.eventsDAO.merge(changed)
+    }
+     yield saved
+  }
 
   override def possibleLocationsForEvent(event: Event): DomainContext => Try[Seq[ScheduleItem]] =
   { implicit ctx =>
       import shareevent.persistence.Repository.Objects._
       for {
         eventId <- event.id.toTry
-        locations <- ctx.repository.locationDAO.query(location.select where location.capacity >= event.minParticipantsQuantity)
+        locations <- ctx.repository.locationDAO.query(
+          location.select where location.capacity >= event.minParticipantsQuantity
+        )
       } yield {
          for{location <- locations
              time <- possibleTimesForLocation(location) } yield {
