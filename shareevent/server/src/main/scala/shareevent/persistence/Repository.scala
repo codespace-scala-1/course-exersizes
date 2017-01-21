@@ -64,7 +64,7 @@ object Repository
       val phoneNo = field[Option[String]]("phoneNo")
     }
 
-    implicit val person: PersonMeta = new PersonMeta
+    implicit val person: PersonMeta = new PersonMeta()
 
     /*case class Booking(time: Interval,
                        event: Event,

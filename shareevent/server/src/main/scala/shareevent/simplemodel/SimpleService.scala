@@ -109,7 +109,15 @@ class SimpleService extends DomainService {
       }
   }
 
-  override def possibleParticipantsInEvent(event: Event): DomainContext => Seq[Person] = ???
+  override def possibleParticipantsInEvent(event: Event): DomainContext => Try[Seq[Person]] =
+    implicit ctx => {
+      import shareevent.persistence.Repository.Objects._
+
+      for { participants <- ctx.repository.personDAO.query(person.select where person.role === Role.Participant)
+             p <- participants
+             isInteresting <- participantInterest(event, p) if isInteresting
+          } yield p
+    }
 
   def possibleTimesForLocation(l:Location)(implicit ctx:DomainContext):Seq[DateTime] = ???
 
