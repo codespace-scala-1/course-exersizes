@@ -1,7 +1,7 @@
 package shareevent.persistence
 
-import scala.language.implicitConversions
 
+import scala.language.implicitConversions
 import javax.naming.LimitExceededException
 
 import scala.reflect.api.TypeTags
@@ -68,6 +68,8 @@ object QueryDSL {
 
   implicit def stringToConstant(s:String): Constant[String] = Constant(s)
   implicit def intToConstant(v:Int):Constant[Int] = Constant(v)
+
+  implicit def enumerationToConstant[E <: scala.Enumeration](x: E#Value) = Constant(x)
 
   sealed trait BooleanExpression
   {

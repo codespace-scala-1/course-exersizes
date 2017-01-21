@@ -113,11 +113,22 @@ class SimpleService extends DomainService {
     implicit ctx => {
       import shareevent.persistence.Repository.Objects._
 
-      for { participants <- ctx.repository.personDAO.query(person.select where person.role === Role.Participant)
-             p <- participants
-             isInteresting <- participantInterest(event, p) if isInteresting
-          } yield p
+      //TODO: kluge
+      def isInterestPlain(p:Person): Boolean =
+        participantInterest(event,p)(ctx) match {
+          case Success(x) => x
+          case Failure(ex) => throw  ex
+        }
+
+
+        for {participants <- ctx.repository.personDAO.query(person.select where person.role === Role.Participant)
+             selected <- Try (for(p <- participants if isInterestPlain(p)) yield p)
+        } yield {
+           selected
+        }
+
     }
+
 
   def possibleTimesForLocation(l:Location)(implicit ctx:DomainContext):Seq[DateTime] = ???
 

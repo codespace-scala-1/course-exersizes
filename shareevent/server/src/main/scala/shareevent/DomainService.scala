@@ -44,7 +44,7 @@ trait DomainService {
 
   def possibleLocationsForEvent(event:Event): DomainContext => Try[Seq[ScheduleItem]]
 
-  def possibleParticipantsInEvent(event: Event): DomainContext => Seq[Person]
+  def possibleParticipantsInEvent(event: Event): DomainContext => Try[Seq[Person]]
 
 
 }
