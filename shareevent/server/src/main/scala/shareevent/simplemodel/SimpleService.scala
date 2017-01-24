@@ -64,7 +64,12 @@ class SimpleService extends DomainService {
           }
           val bookings = location.bookings
           val isBad = bookings.exists(booking => isCrossTime(booking, scheduleItem.time) && scheduleItem.eventId != booking.eventId)
-          !isBad
+          if (isBad) {
+             throw new RuntimeException("Can't allocate time for item")
+          } else {
+             // ? change state ?
+             scheduleItem
+          }
         }
         case Failure(ex) => throw ex
       }
