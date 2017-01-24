@@ -55,14 +55,21 @@ class SimpleService extends DomainService {
   }
 
   override def locationConfirm(scheduleItem: ScheduleItem): DomainContext => Try[ScheduleItem] = {
-    def isCrossTime(booking:Booking,time:DateTime): Boolean =
-    {
-        booking.time.contains(time)
-    }
+    ctx => Try {
 
-    //c§tx =>
-      //scheduleItem.location
-    ???
+      ctx.repository.locationDAO.retrieveExistent(scheduleItem.locationId.id) match {
+        case Success(location) => {
+          def isCrossTime(booking: Booking, time: DateTime): Boolean = {
+            booking.time.contains(time)
+          }
+          val bookings = location.bookings
+          val isBad = bookings.exists(booking => isCrossTime(booking, scheduleItem.time) && scheduleItem.eventId != booking.eventId)
+          !isBad
+        }
+        case Failure(ex) => throw ex
+      }
+      // booking chaNGE STATUS , RETURN
+    }
   }
 
   override def generalConfirm(scheduleItem: ScheduleItem): DomainContext => Confirmation = {
