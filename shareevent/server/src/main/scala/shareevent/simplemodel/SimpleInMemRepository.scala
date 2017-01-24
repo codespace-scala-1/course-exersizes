@@ -31,18 +31,38 @@ class SimpleInMemRepository extends Repository {
     override def store(obj: T): Try[T] = {
       val (key, withKey) = getKey(obj) match {
         case Some(k) => (k,obj)
-        case None => setKey(idGenerator.gen(),obj)
+        case None => val newKey = idGenerator.gen()
+          (newKey, setKey(newKey,obj))
       }
-      Success(synchronized {
-          ??? //storage = storage.updated(getKey(obj), obj)
+      this.synchronized {
+          storage = storage.updated(key, withKey)
+      }
+      Success(withKey)
+    }
+
+    override def retrieve(key: K): Try[Option[T]] =
+    {
+      Success(storage.get(key))
+    }
+
+    override def delete(key: K): Try[Boolean] =
+    {
+      Try(synchronized{
+        if (storage.isDefinedAt(key)) {
+          storage -= key
+          true
+        }else false
       })
     }
 
-    override def retrieve(key: K): Try[Option[T]] = ???
-
-    override def delete(key: K): Try[Boolean] = ???
-
-    override def merge(instance: T): Try[T] = ???
+    override def merge(instance: T): Try[T] =
+      Try {synchronized{
+        getKey(instance) match {
+          case Some(k) => storage = storage.updated(k,instance)
+                          instance
+          case None => throw new IllegalStateException("attempt to merge undetached instance")
+        }
+      }}
 
     override def query[MT <: ObjectMeta[T, MT]](q: QueryExpression[MT])(implicit mt: ObjectMeta[T, MT]): Try[Seq[T]] = {
       q match {
@@ -73,7 +93,12 @@ class SimpleInMemRepository extends Repository {
                            ///val getter =
                          ???
                      }
-
+        case AndBooleanExpression(x,y) =>
+              t => createPredicate(x)(t) && createPredicate(y)(t)
+        case OrBooleanExpression(x,y) =>
+              t => createPredicate(x)(t) || createPredicate(y)(t)
+        case NotBooleanExpression(x) =>
+              t => !createPredicate(x)(t)
       }
     }
 
