@@ -23,17 +23,17 @@ object QueryDSL {
                                  val name: String,
                                  val optional: Boolean,
                                  val table: ObjectMeta[O,OM]
-                               ) extends FieldExpersion[T]
+                               ) extends FieldExpression[T]
   {
 
-    def === (other: FieldExpersion[T]) = Equals(this,other)
-    def =*= (other: FieldExpersion[T]) = Equals(this,other)
+    def === (other: FieldExpression[T]) = Equals(this,other)
+    def =*= (other: FieldExpression[T]) = Equals(this,other)
 
-    def !== (other: FieldExpersion[T]) = NonEquals(this,other)
+    def !== (other: FieldExpression[T]) = NonEquals(this,other)
     def isNil = IsNil(this)
 
-    def <= (other: FieldExpersion[T])(implicit o: Ordering[T]) = LessEq(this,other)
-    def >= (other: FieldExpersion[T])(implicit o: Ordering[T]) = GreaterEq(this,other)
+    def <=(other: FieldExpression[T])(implicit o: Ordering[T]) = LessEq(this,other)
+    def >=(other: FieldExpression[T])(implicit o: Ordering[T]) = GreaterEq(this,other)
 
     override def toString = s"field(${name})"
   }
@@ -62,9 +62,9 @@ object QueryDSL {
   case class OffsetExpression[T](origin:QueryExpression[T],lim:Int) extends QueryExpression[T]
 
 
-  sealed trait FieldExpersion[T]
+  sealed trait FieldExpression[T]
 
-  case class Constant[T](val t:T) extends FieldExpersion[T]
+  case class Constant[T](val t:T) extends FieldExpression[T]
 
   implicit def stringToConstant(s:String): Constant[String] = Constant(s)
   implicit def intToConstant(v:Int):Constant[Int] = Constant(v)
@@ -81,16 +81,16 @@ object QueryDSL {
 
   sealed trait FieldComparison extends BooleanExpression
 
-  case class Equals[T](x:FieldExpersion[T],y:FieldExpersion[T]) extends FieldComparison
+  case class Equals[T](x:FieldExpression[T], y:FieldExpression[T]) extends FieldComparison
 
-  case class NonEquals[T](x:FieldExpersion[T],y:FieldExpersion[T]) extends FieldComparison
+  case class NonEquals[T](x:FieldExpression[T], y:FieldExpression[T]) extends FieldComparison
 
-  case class LessEq[T](x:FieldExpersion[T],y:FieldExpersion[T])(implicit o:Ordering[T]) extends FieldComparison
+  case class LessEq[T](x:FieldExpression[T], y:FieldExpression[T])(implicit o:Ordering[T]) extends FieldComparison
 
-  case class GreaterEq[T](x:FieldExpersion[T],y:FieldExpersion[T])(implicit o:Ordering[T]) extends FieldComparison
+  case class GreaterEq[T](x:FieldExpression[T], y:FieldExpression[T])(implicit o:Ordering[T]) extends FieldComparison
 
 
-  case class IsNil[T](x:FieldExpersion[T]) extends BooleanExpression
+  case class IsNil[T](x:FieldExpression[T]) extends BooleanExpression
 
   sealed trait BooleanOperator extends BooleanExpression
 

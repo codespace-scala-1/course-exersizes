@@ -8,6 +8,7 @@ import org.json4s.JsonDSL._
 
 import org.scalatest._
 import scala.concurrent.duration._
+import scala.concurrent._
 import scala.language.postfixOps._
 
 
@@ -26,7 +27,7 @@ class RegisterParticipantAsyncTest  extends AsyncWordSpec with Matchers with Ser
         response.status shouldEqual StatusCodes.Conflict
 
 
-        val f = response.entity.toStrict(1 second).map(_.data.decodeString("UTF-8"))
+        val f: Future[String] = response.entity.toStrict(1 second).map(_.data.decodeString("UTF-8"))
 
 
         f map { s =>

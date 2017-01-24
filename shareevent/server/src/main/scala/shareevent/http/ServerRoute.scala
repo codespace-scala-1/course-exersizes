@@ -35,11 +35,19 @@ class ServerRoute(implicit actorSystem: ActorSystem,
   val defaultFormats = Serialization.formats(NoTypeHints) + new EnumSerializer(Role)
   val personFormats = new CustomSerializer[Person](formats => (
     { case p: JObject =>
-      implicit val formats = defaultFormats
-      val pWithRole = p merge JObject(JField("role", JInt(Role.Participant.id)) :: Nil) //TODO: what happens if JObject already contains role
-      pWithRole.extract[Person]
+        implicit val formats = defaultFormats
+        val pWithRole = p merge JObject(JField("role", JInt(Role.Participant.id)) :: Nil) //TODO: what happens if JObject already contains role
+        pWithRole.extract[Person]
     },
     PartialFunction.empty
+    /*{ case p: Person =>
+        implicit val formats = defaultFormats
+        val jsWithRole = Extraction.decompose(p)
+        jsWithRole.removeField{
+          case ("role", _) => true
+          case _ => false
+        }
+    }*/
     ))
 
   implicit val formats = defaultFormats + personFormats
