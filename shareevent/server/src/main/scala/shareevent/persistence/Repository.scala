@@ -14,7 +14,7 @@ trait Repository
 
   trait DAO[K, T] {
 
-    def query[MT<:ObjectMeta[T,MT]](q: QueryDSL.QueryExpression[MT])(implicit mt:ObjectMeta[T,MT]): Try[Seq[T]] = ???
+    def query[MT<:ObjectMeta[T,MT]](q: QueryDSL.QueryExpression[MT])(implicit mt:ObjectMeta[T,MT]): Try[Seq[T]]
 
     def store(obj: T): Try[T]
 

@@ -3,6 +3,7 @@ package shareevent.persistence.inmem
 import org.joda.time.DateTime
 import shareevent.DomainContext
 import shareevent.model.{Event, Location, Person}
+import shareevent.persistence.QueryDSL.{ObjectMeta, QueryExpression}
 import shareevent.persistence.Repository
 
 import scala.util.{Success, Try}
@@ -44,6 +45,7 @@ class InMemoryContext extends DomainContext {
         r.toRight(new IllegalArgumentException(s"instance ${instance.login} is not in our collection")).toTry
       }
 
+      override def query[MT <: ObjectMeta[Person, MT]](q: QueryExpression[MT])(implicit mt: ObjectMeta[Person, MT]): Try[Seq[Person]] = ???
     }
 
 

@@ -11,7 +11,7 @@ object QueryDSL {
 
   class ObjectMeta[T,This<:ObjectMeta[T,This]](val metaTableName:String)
   {
-    def select = new TableSelectionExpression[This]
+    def select = new TableSelectionExpression[This]()
 
     def field[F](name:String, isId:Boolean=false, optional:Boolean=false) =
       new ObjectFieldMeta[T,F,This](isId,name,optional,this)
@@ -70,6 +70,8 @@ object QueryDSL {
   implicit def intToConstant(v:Int):Constant[Int] = Constant(v)
 
   implicit def enumerationToConstant[E <: scala.Enumeration](x: E#Value) = Constant(x)
+
+  implicit def optionToConstant[T](v:Option[T])(implicit ct:Constant[T]):Constant[Option[T]] = Constant(v)
 
   sealed trait BooleanExpression
   {
