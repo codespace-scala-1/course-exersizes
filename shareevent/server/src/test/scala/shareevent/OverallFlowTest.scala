@@ -1,26 +1,29 @@
 package shareevent
 
 
-
+import scala.language.higherKinds
 import org.scalatest.FunSpec
 import shareevent.model.{Person, ScheduleItem}
 
 import scala.util.Try
+import cats._
+import cats.syntax.all._
+
 
 class OverallFlowTest extends FunSpec {
 
 
 
-  def bestScheduleLocations(scheduleItems: Seq[ScheduleItem]): DomainContext => Try[ScheduleItem] =
+  def bestScheduleLocations[M[_]](scheduleItems: Seq[ScheduleItem])(implicit m:Monad[M]): DomainContext => M[ScheduleItem] =
   {
     ???
   }
 
-  def runEvent(service:DomainService)(organizer: Person, title: String): DomainContext => Try[ScheduleItem] =
+  def runEvent[M[_]](service:DomainService[M])(organizer: Person, title: String)(implicit m:Monad[M]): DomainContext => M[ScheduleItem] =
     ctx => {
       for {event <- service.createEvent(organizer, title, theme = "*")(ctx)
            scheduledItems <- service.possibleLocationsForEvent(event)(ctx)
-           scheduledItem <- bestScheduleLocations(scheduledItems)(ctx)
+           scheduledItem <- bestScheduleLocations[M](scheduledItems)(m)(ctx)
       } yield scheduledItem
     }
 

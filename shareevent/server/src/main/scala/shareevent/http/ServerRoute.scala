@@ -30,7 +30,7 @@ class ServerRoute(implicit actorSystem: ActorSystem,
                   materializer: Materializer,
                   execCtx: ExecutionContext,
                   context: DomainContext,
-                  service: DomainService) extends Json4sSupport {
+                  service: DomainService[Try]) extends Json4sSupport {
   //important: both formats and serialization implicits need to be in scope
   val defaultFormats = Serialization.formats(NoTypeHints) + new EnumSerializer(Role)
   val personFormats = new CustomSerializer[Person](formats => (

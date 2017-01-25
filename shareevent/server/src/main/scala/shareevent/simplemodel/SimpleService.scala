@@ -11,7 +11,7 @@ import shareevent.persistence.Repository.Objects.location
 
 import QueryDSL._
 
-class SimpleService extends DomainService {
+class SimpleService extends DomainService[Try] {
 
 
   def createEvent(organizer: Person, title: String, theme: String, organizerCost: Money, duration: JodaDuration,

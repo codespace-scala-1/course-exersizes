@@ -9,12 +9,14 @@ import shareevent.http.ServerRoute
 import shareevent.persistence.inmem.InMemoryContext
 import shareevent.{DomainService, simplemodel}
 
+import scala.util.Try
+
 trait ServerRouteTestCommons extends  ScalatestRouteTest with Json4sSupport {
 
   this: Suite ⇒
 
   implicit val repository = new InMemoryContext()
-  implicit val service: DomainService = new simplemodel.SimpleService
+  implicit val service: DomainService[Try] = new simplemodel.SimpleService
   val serverRoute = new ServerRoute()
 
   implicit val formats = DefaultFormats

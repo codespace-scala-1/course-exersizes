@@ -9,12 +9,13 @@ import shareevent.DomainService
 import shareevent.persistence.inmem.InMemoryContext
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Try
 
 object Server extends App {
   implicit val actorSystem = ActorSystem()
   implicit val materializer = ActorMaterializer()
   implicit val repository = new InMemoryContext()
-  implicit val service: DomainService = new simplemodel.SimpleService
+  implicit val service: DomainService[Try] = new simplemodel.SimpleService
 
   val route = new ServerRoute().route
 

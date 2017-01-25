@@ -16,7 +16,8 @@ lazy val commonSettings = Seq(
     "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
     "org.json4s" %% "json4s-native" % "3.5.0",
     "org.json4s" %% "json4s-ext" % "3.5.0",
-    "de.heikoseeberger" %% "akka-http-json4s" % "1.11.0"
+    "de.heikoseeberger" %% "akka-http-json4s" % "1.11.0",
+    "org.typelevel" %% "cats" % "0.9.0"
   )
 )
 
