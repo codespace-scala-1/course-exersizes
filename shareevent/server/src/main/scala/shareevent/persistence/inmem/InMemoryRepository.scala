@@ -1,6 +1,9 @@
 package shareevent.persistence.inmem
 
 import cats._
+import cats.instances.all._
+import shareevent._
+
 import org.joda.time.DateTime
 import shareevent.DomainContext
 import shareevent.model.{Event, Location, Person}
@@ -10,13 +13,12 @@ import shareevent.persistence.Repository
 import scala.util.{Success, Try}
 import scala.language.higherKinds._
 
+
 class InMemoryContext extends DomainContext[Try] {
 
 
-  class InMemoryRepo extends Repository[Try] {
-
-    implicit val  mMonad: Monad[Try] = implicitly[Monad[Try]]
-    implicit val tryToMonad: Try ~> Try = implicitly[Try ~> Try]
+  class InMemoryRepo(implicit val mMonad:Monad[Try],
+                     val tryToMonad: Try ~> Try) extends Repository[Try] {
 
 
     import shareevent.persistence.Repository._

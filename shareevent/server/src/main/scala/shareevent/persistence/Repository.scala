@@ -15,7 +15,7 @@ trait Repository[M[_]]
   import Repository._
 
   implicit val mMonad: Monad[M]
-  implicit val tryToMonad: Try ~> M
+  implicit val tryToMonad: ~> [Try, M]
 
 
   trait DAO[K, T] {

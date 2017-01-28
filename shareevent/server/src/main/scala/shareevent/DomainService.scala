@@ -4,7 +4,6 @@ import scala.language.higherKinds
 import org.joda.time.{DateTime, Duration => JodaDuration}
 import shareevent.model._
 
-import scala.util.Try
 
 trait DomainService[M[_]] {
 
