@@ -105,8 +105,10 @@ class SimpleInMemRepository(implicit override val mMonad:Monad[Try],
       }
     }
 
+
     def predicateFromFieldComparison[T](fc: FieldComparison):
     T => Boolean = ???
+
 
 
     def queryAll(): Seq[T] = {
