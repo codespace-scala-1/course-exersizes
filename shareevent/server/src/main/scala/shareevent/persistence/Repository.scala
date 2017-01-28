@@ -1,34 +1,46 @@
 package shareevent.persistence
 
+import cats.{Monad, ~>}
+import cats.syntax.all._
 import org.joda.time.Interval
 import shareevent.model.Role.Role
 import shareevent.model._
 import shareevent.persistence.QueryDSL.ObjectMeta
 
 import scala.util.{Failure, Success, Try}
+import scala.language.higherKinds
 
-trait Repository
+trait Repository[M[_]]
 {
   import Repository._
+
+  implicit val mMonad: Monad[M]
+  implicit val tryToMonad: Try ~> M
 
 
   trait DAO[K, T] {
 
-    def query[MT<:ObjectMeta[T,MT]](q: QueryDSL.QueryExpression[MT])(implicit mt:ObjectMeta[T,MT]): Try[Seq[T]]
 
-    def store(obj: T): Try[T]
+    def query[MT<:ObjectMeta[T,MT]](q: QueryDSL.QueryExpression[MT])(implicit mt:ObjectMeta[T,MT]): M[Seq[T]]
 
-    def retrieve(key: K): Try[Option[T]]
+    def store(obj: T): M[T]
 
-    def retrieveExistent(key:K): Try[T] =
-      retrieve(key).flatMap{
-        case Some(o) => Success(o)
-        case None => Failure(new IllegalStateException("pk not found"))
+    def retrieve(key: K): M[Option[T]]
+
+    def retrieveExistent(key:K): M[T] = {
+      retrieve(key).flatMap { opt =>
+        val t: Try[T] = opt match {
+          case Some(o) => Success(o)
+          case None => Failure(new IllegalStateException("pk not found"))
+        }
+        tryToMonad(t)
       }
 
-    def delete(key: K): Try[Boolean]
+    }
 
-    def merge(instance: T): Try[T]
+    def delete(key: K): M[Boolean]
+
+    def merge(instance: T): M[T]
   }
 
 

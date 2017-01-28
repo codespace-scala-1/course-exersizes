@@ -24,12 +24,12 @@ import org.json4s.{CustomSerializer, Extraction, NoTypeHints}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
+import scala.language.higherKinds
 
-
-class ServerRoute(implicit actorSystem: ActorSystem,
+class ServerRoute[M[_]](implicit actorSystem: ActorSystem,
                   materializer: Materializer,
                   execCtx: ExecutionContext,
-                  context: DomainContext,
+                  context: DomainContext[Try],
                   service: DomainService[Try]) extends Json4sSupport {
   //important: both formats and serialization implicits need to be in scope
   val defaultFormats = Serialization.formats(NoTypeHints) + new EnumSerializer(Role)

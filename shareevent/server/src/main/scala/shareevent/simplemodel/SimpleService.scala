@@ -15,7 +15,7 @@ class SimpleService extends DomainService[Try] {
 
 
   def createEvent(organizer: Person, title: String, theme: String, organizerCost: Money, duration: JodaDuration,
-                  scheduleWindow: JodaDuration, quantityOfParticipants: Int): DomainContext => Try[Event] = {
+                  scheduleWindow: JodaDuration, quantityOfParticipants: Int): DomainContext[Try] => Try[Event] = {
   ctx =>
     Try {
       require(organizer.role == Role.Organizer)
@@ -36,7 +36,7 @@ class SimpleService extends DomainService[Try] {
   }
 
   override def createLocation(name: String, capacity: Int, startSchedule: DateTime, endSchedule: DateTime, coordinate: Coordinate,
-                              costs: Money): DomainContext => Try[Location] = { ctx =>
+                              costs: Money): DomainContext[Try] => Try[Location] = { ctx =>
       // TODO: add check that capacity > 0
       ctx.repository.locationDAO.store(
         Location(None, name, capacity, coordinate, Seq.empty)
@@ -47,14 +47,14 @@ class SimpleService extends DomainService[Try] {
     * If participant is interested in event, he can participate
     * in scheduling of one.
     */
-  override def participantInterest(event: Event, participant: Person): (DomainContext) => Try[Boolean] = _ => Success(true)
+  override def participantInterest(event: Event, participant: Person): (DomainContext[Try]) => Try[Boolean] = _ => Success(true)
 
-  override def schedule(eventId: Event.Id, locationId: Location.Id, time: DateTime): DomainContext => Try[ScheduleItem] = {
+  override def schedule(eventId: Event.Id, locationId: Location.Id, time: DateTime): DomainContext[Try] => Try[ScheduleItem] = {
 
     _ => Try(ScheduleItem(eventId, locationId, time, Seq.empty))
   }
 
-  override def locationConfirm(scheduleItem: ScheduleItem): DomainContext => Try[ScheduleItem] = {
+  override def locationConfirm(scheduleItem: ScheduleItem): DomainContext[Try] => Try[ScheduleItem] = {
     ctx => Try {
 
       ctx.repository.locationDAO.retrieveExistent(scheduleItem.locationId.id) match {
@@ -77,12 +77,12 @@ class SimpleService extends DomainService[Try] {
     }
   }
 
-  override def generalConfirm(scheduleItem: ScheduleItem): DomainContext => Confirmation = {
+  override def generalConfirm(scheduleItem: ScheduleItem): DomainContext[Try] => Confirmation = {
     _ => Confirmation(scheduleItem)
   }
 
 
-  override def cancel(confirmation: Confirmation): DomainContext => Try[Event] =
+  override def cancel(confirmation: Confirmation): DomainContext[Try] => Try[Event] =
 
     context => {
 
@@ -104,7 +104,7 @@ class SimpleService extends DomainService[Try] {
   }
 
 
-  override def run(confirmation: Confirmation): DomainContext => Try[Event] =
+  override def run(confirmation: Confirmation): DomainContext[Try] => Try[Event] =
   ctx => {
     for {event <- ctx.repository.eventsDAO.retrieveExistent(
                               confirmation.scheduleItem.eventId.id)
@@ -114,7 +114,7 @@ class SimpleService extends DomainService[Try] {
      yield saved
   }
 
-  override def possibleLocationsForEvent(event: Event): DomainContext => Try[Seq[ScheduleItem]] =
+  override def possibleLocationsForEvent(event: Event): DomainContext[Try] => Try[Seq[ScheduleItem]] =
   { implicit ctx =>
       import shareevent.persistence.Repository.Objects._
 
@@ -146,7 +146,7 @@ class SimpleService extends DomainService[Try] {
       }
   }
 
-  override def possibleParticipantsInEvent(event: Event): DomainContext => Try[Seq[Person]] =
+  override def possibleParticipantsInEvent(event: Event): DomainContext[Try] => Try[Seq[Person]] =
     implicit ctx => {
       import shareevent.persistence.Repository.Objects._
 
@@ -166,7 +166,7 @@ class SimpleService extends DomainService[Try] {
 
     }
 
-  def possibleTimesForLocation(l:Location)(implicit ctx:DomainContext):Try[Seq[DateTime]] = {
+  def possibleTimesForLocation(l:Location)(implicit ctx:DomainContext[Try]):Try[Seq[DateTime]] = {
 
     for {locationId <- l.id.toTry
          location <- ctx.repository.locationDAO.retrieveExistent(locationId.id)

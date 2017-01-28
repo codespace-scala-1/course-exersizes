@@ -9,7 +9,7 @@ import org.json4s.JsonDSL._
 import org.scalatest._
 import scala.concurrent.duration._
 import scala.concurrent._
-import scala.language.postfixOps._
+import scala.language.postfixOps
 
 
 import scala.concurrent.Await

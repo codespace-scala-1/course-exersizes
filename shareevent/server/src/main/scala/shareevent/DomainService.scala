@@ -17,7 +17,7 @@ trait DomainService[M[_]] {
                   duration: JodaDuration = JodaDuration.standardHours(2),
                   scheduleWindow: JodaDuration = JodaDuration.standardDays(14),
                   quantityOfParticipants: Int = 5
-                 ): DomainContext => M[Event]
+                 ): DomainContext[M] => M[Event]
 
 
   def createLocation(name: String,
@@ -25,28 +25,27 @@ trait DomainService[M[_]] {
                      startSchedule: DateTime,
                      endSchedule: DateTime,
                      coordination: Coordinate,
-                     costs: Money): DomainContext => M[Location]
+                     costs: Money): DomainContext[M] => M[Location]
 
 
   /**
     * If participant is interested in event, he can participate
     * in scheduling of one.
     */
-  def participantInterest(event:Event, participant: Person): (DomainContext) => M[Boolean]
+  def participantInterest(event:Event, participant: Person): (DomainContext[M]) => M[Boolean]
 
-  def schedule(eventId: Event.Id, locationId: Location.Id, time: DateTime): DomainContext => M[ScheduleItem]
+  def schedule(eventId: Event.Id, locationId: Location.Id, time: DateTime): DomainContext[M] => M[ScheduleItem]
 
-  def locationConfirm(scheduleItem: ScheduleItem): DomainContext => M[ScheduleItem]
+  def locationConfirm(scheduleItem: ScheduleItem): DomainContext[M] => M[ScheduleItem]
 
-  def generalConfirm(scheduleItem: ScheduleItem): DomainContext => Confirmation
+  def generalConfirm(scheduleItem: ScheduleItem): DomainContext[M] => Confirmation
 
-  def cancel(confirmation: Confirmation): DomainContext => M[Event]
+  def cancel(confirmation: Confirmation): DomainContext[M] => M[Event]
 
-  def run(confirmation: Confirmation): DomainContext => M[Event]
+  def run(confirmation: Confirmation): DomainContext[M] => M[Event]
 
-  def possibleLocationsForEvent(event:Event): DomainContext => M[Seq[ScheduleItem]]
+  def possibleLocationsForEvent(event:Event): DomainContext[M] => M[Seq[ScheduleItem]]
 
-  def possibleParticipantsInEvent(event: Event): DomainContext => M[Seq[Person]]
-
+  def possibleParticipantsInEvent(event: Event): DomainContext[M] => M[Seq[Person]]
 
 }

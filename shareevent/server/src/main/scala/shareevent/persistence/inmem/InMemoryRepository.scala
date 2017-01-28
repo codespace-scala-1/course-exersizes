@@ -1,5 +1,6 @@
 package shareevent.persistence.inmem
 
+import cats._
 import org.joda.time.DateTime
 import shareevent.DomainContext
 import shareevent.model.{Event, Location, Person}
@@ -7,39 +8,41 @@ import shareevent.persistence.QueryDSL.{ObjectMeta, QueryExpression}
 import shareevent.persistence.Repository
 
 import scala.util.{Success, Try}
+import scala.language.higherKinds._
 
-class InMemoryContext extends DomainContext {
+class InMemoryContext extends DomainContext[Try] {
 
-  class InMemoryRepo extends Repository {
+
+  class InMemoryRepo extends Repository[Try] {
+
+    implicit val  mMonad: Monad[Try] = implicitly[Monad[Try]]
+    implicit val tryToMonad: Try ~> Try = implicitly[Try ~> Try]
+
 
     import shareevent.persistence.Repository._
 
-    override val personDAO: DAO[String,Person] = new DAO[String,Person] {
+    override val personDAO: DAO[String, Person] = new DAO[String, Person] {
 
-      private var participants = Map[String,Person]()
+      private var participants = Map[String, Person]()
 
-      def store(obj: Person): Try[Person] =
-      {
-        participants = participants.updated(obj.login,obj)
+      def store(obj: Person): Try[Person] = {
+        participants = participants.updated(obj.login, obj)
         Success(obj)
       }
 
-      def retrieve(key: String): Try[Option[Person]] =
-      {
+      def retrieve(key: String): Try[Option[Person]] = {
         Success(participants.get(key))
       }
 
-      def delete(key: String): Try[Boolean] =
-      {
+      def delete(key: String): Try[Boolean] = {
         val oldParticipants = participants
         participants = participants - key
         Success(participants.size != oldParticipants.size)
       }
 
-      def merge(instance: Person): Try[Person] =
-      {
+      def merge(instance: Person): Try[Person] = {
         val r = participants.get(instance.login) map { p =>
-          participants = participants.updated(instance.login,instance)
+          participants = participants.updated(instance.login, instance)
           instance
         }
         r.toRight(new IllegalArgumentException(s"instance ${instance.login} is not in our collection")).toTry
@@ -51,7 +54,7 @@ class InMemoryContext extends DomainContext {
 
     override lazy val locationDAO: DAO[Long, Location] = ???
 
-    override lazy val eventsDAO: DAO[Long, Event ] = ???
+    override lazy val eventsDAO: DAO[Long, Event] = ???
 
     //override def retrieveDao[K, T](): DAO[K, T] = ???
   }
