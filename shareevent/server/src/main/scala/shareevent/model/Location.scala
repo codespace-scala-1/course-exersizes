@@ -29,4 +29,6 @@ object Location
 
   type Id = PersistenceId[Long,Location]
 
+  def id(l:Long) = new Id(l)
+
 }
