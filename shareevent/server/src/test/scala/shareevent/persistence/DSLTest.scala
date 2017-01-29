@@ -10,7 +10,7 @@ class DSLTest extends FunSuite {
      import QueryDSL._
      import Repository.Objects._
 
-     val qMe = person.select where ((person.login === "me") && person.phoneNo.isNil)
+     val qMe = personMeta.select where ((personMeta.login === "me") && personMeta.phoneNo.isNil)
 
      System.err.println(s"DSLTest: qMe=${qMe}")
 
