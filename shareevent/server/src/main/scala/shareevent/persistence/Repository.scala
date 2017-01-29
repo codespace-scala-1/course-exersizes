@@ -2,7 +2,8 @@ package shareevent.persistence
 
 import cats.{Monad, ~>}
 import cats.syntax.all._
-import org.joda.time.Interval
+import org.joda.time.{DateTime, Duration=>JodaDuration, Interval}
+import shapeless.LabelledGeneric
 import shareevent.model.Role.Role
 import shareevent.model._
 import shareevent.persistence.QueryDSL.ObjectMeta
@@ -20,8 +21,7 @@ trait Repository[M[_]]
 
   trait DAO[K, T] {
 
-
-    def query[MT<:ObjectMeta[T,MT]](q: QueryDSL.QueryExpression[MT])(implicit mt:ObjectMeta[T,MT]): M[Seq[T]]
+    def query[MT<:ObjectMeta[T,MT]](q: QueryDSL.QueryExpression[MT]): M[Seq[T]]
 
     def store(obj: T): M[T]
 
@@ -49,10 +49,10 @@ trait Repository[M[_]]
   val personDAO: DAO[String,Person]
 
 
-  val locationDAO:  DAO[Long,Location]
+  val locationDAO:  DAO[Location.Id,Location]
 
 
-  val eventsDAO: DAO[Long,Event]
+  val eventsDAO: DAO[Event.Id,Event]
 
 
 }
@@ -66,8 +66,10 @@ object Repository
     import QueryDSL._
 
 
-
+    import shapeless.record._
     class PersonMeta extends ObjectMeta[Person,PersonMeta]("person") {
+      def toMap(x:Person):Map[Symbol,Any] = LabelledGeneric[Person].to(x).toMap
+
       val login = field[String]("login")
       val password = field[String]("password")
       val role = field[Role]("role")
@@ -76,7 +78,7 @@ object Repository
       val phoneNo = field[Option[String]]("phoneNo")
     }
 
-    implicit val person: PersonMeta = new PersonMeta()
+    implicit val personMeta: PersonMeta = new PersonMeta()
 
     /*case class Booking(time: Interval,
                        event: Event,
@@ -85,23 +87,38 @@ object Repository
 
 
     class LocationMeta extends ObjectMeta[Location,LocationMeta]("location")  {
+      def  toMap(x:Location):Map[Symbol,Any] = LabelledGeneric[Location].to(x).toMap
       val name = field[String]("name")
       val capacity = field[Int]("capacity")
       val coordinate = field[Location]("coordinate")
       val bookings = field[Seq[Booking]]("booking")
     }
-    implicit val location: LocationMeta = new LocationMeta()
+    implicit val locationMeta: LocationMeta = new LocationMeta()
 
     class BookingMeta extends ObjectMeta[Booking,BookingMeta]("booking") {
-      val time = field("time")
+      def  toMap(x:Booking):Map[Symbol,Any] = LabelledGeneric[Booking].to(x).toMap
+      val time = field[DateTime]("time")
       val event = field[Event]("event")
       val status = field[BookingStatus]("status")
     }
 
     class EventMeta extends ObjectMeta[Event,EventMeta]("event") {
       // TODO: add fields which needed.
+      def  toMap(x:Event):Map[Symbol,Any] = LabelledGeneric[Event].to(x).toMap
+
+      val id = field[Option[Event.Id]]("id")
+      val title = field[String]("title")
+      val theme = field[String]("theme")
+      val organizerId = field[Person.Id]("organizerId")
+      val organizerCost = field[Money]("organizerCost")
+      val status = field[EventStatus]("eventStatus")
+      val created = field[DateTime]("created")
+      val duration = field[JodaDuration]("duration")
+      val scheduleWindow = field[JodaDuration]("scheduleWindow")
+      val minParticipantsQuantity = field[Int]("minParticipantsQuantity")
 
     }
+    implicit val eventMeta: EventMeta = new EventMeta
 
 
   }

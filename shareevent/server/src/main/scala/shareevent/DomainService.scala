@@ -9,7 +9,7 @@ trait DomainService[M[_]] {
 
   
 
-  def createEvent(organizer: Person,
+  def createEvent(organizerId: Person.Id,
                   title: String,
                   theme: String,
                   organizerCost: Money = Money.zero,

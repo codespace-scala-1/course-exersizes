@@ -21,7 +21,7 @@ class OverallFlowTest extends FunSpec {
 
   def runEvent[M[_]](service:DomainService[M])(organizer: Person, title: String)(implicit m:Monad[M]): DomainContext[M] => M[ScheduleItem] =
     ctx => {
-      for {event <- service.createEvent(organizer, title, theme = "*")(ctx)
+      for {event <- service.createEvent(organizer.login, title, theme = "*")(ctx)
            scheduledItems <- service.possibleLocationsForEvent(event)(ctx)
            scheduledItem <- bestScheduleLocations[M](scheduledItems)(m)(ctx)
       } yield scheduledItem

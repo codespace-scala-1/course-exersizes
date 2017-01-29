@@ -7,23 +7,22 @@ import shareevent.model._
 import scala.util.{Failure, Success, Try}
 import org.joda.time.Interval
 import shareevent.persistence.QueryDSL
-import shareevent.persistence.Repository.Objects.location
 
 import QueryDSL._
 
 class SimpleService extends DomainService[Try] {
 
 
-  def createEvent(organizer: Person, title: String, theme: String, organizerCost: Money, duration: JodaDuration,
+  def createEvent(organizerId: Person.Id, title: String, theme: String,
+                  organizerCost: Money, duration: JodaDuration,
                   scheduleWindow: JodaDuration, quantityOfParticipants: Int): DomainContext[Try] => Try[Event] = {
   ctx =>
     Try {
-      require(organizer.role == Role.Organizer)
       Event(
         None,
         title = title,
         theme = theme,
-        organizer = OrganizerTag.tag(organizer),
+        organizerId = organizerId,
         organizerCost = organizerCost,
         status = EventStatus.Initial,
         created = ctx.currentTime,
@@ -57,7 +56,7 @@ class SimpleService extends DomainService[Try] {
   override def locationConfirm(scheduleItem: ScheduleItem): DomainContext[Try] => Try[ScheduleItem] = {
     ctx => Try {
 
-      ctx.repository.locationDAO.retrieveExistent(scheduleItem.locationId.id) match {
+      ctx.repository.locationDAO.retrieveExistent(scheduleItem.locationId) match {
         case Success(location) => {
           def isCrossTime(booking: Booking, time: DateTime): Boolean = {
             booking.time.contains(time)
@@ -90,9 +89,9 @@ class SimpleService extends DomainService[Try] {
       val eventId = item.eventId
 
       for {
-           event <- context.repository.eventsDAO.retrieveExistent(eventId.id)
+           event <- context.repository.eventsDAO.retrieveExistent(eventId)
            interval = new Interval(item.time, event.duration)
-           location <- context.repository.locationDAO.retrieveExistent(item.locationId.id)
+           location <- context.repository.locationDAO.retrieveExistent(item.locationId)
            changed = location.copy(bookings = location.bookings.filterNot( _ == Booking(interval,eventId)))
            savedLocation = context.repository.locationDAO.merge(changed)
            cancelledEvent = event.copy(status = EventStatus.Cancelled)
@@ -107,7 +106,7 @@ class SimpleService extends DomainService[Try] {
   override def run(confirmation: Confirmation): DomainContext[Try] => Try[Event] =
   ctx => {
     for {event <- ctx.repository.eventsDAO.retrieveExistent(
-                              confirmation.scheduleItem.eventId.id)
+                              confirmation.scheduleItem.eventId)
          changed = event.copy(status = EventStatus.Done)
          saved <- ctx.repository.eventsDAO.merge(changed)
     }
@@ -138,7 +137,7 @@ class SimpleService extends DomainService[Try] {
     for {
         eventId <- event.id.toTry
         locations <- ctx.repository.locationDAO.query(
-          location.select where location.capacity >= event.minParticipantsQuantity
+          locationMeta.select where locationMeta.capacity >= eventMeta.minParticipantsQuantity
         )
         scheduleItems <- genSecheduleItems(eventId,locations)
       } yield {
@@ -158,7 +157,7 @@ class SimpleService extends DomainService[Try] {
         }
 
 
-        for {participants <- ctx.repository.personDAO.query(person.select where person.role === Role.Participant)
+        for {participants <- ctx.repository.personDAO.query(personMeta.select where personMeta.role === Role.Participant)
              selected <- Try (for(p <- participants if isInterestPlain(p)) yield p)
         } yield {
            selected
@@ -169,7 +168,7 @@ class SimpleService extends DomainService[Try] {
   def possibleTimesForLocation(l:Location)(implicit ctx:DomainContext[Try]):Try[Seq[DateTime]] = {
 
     for {locationId <- l.id.toTry
-         location <- ctx.repository.locationDAO.retrieveExistent(locationId.id)
+         location <- ctx.repository.locationDAO.retrieveExistent(locationId)
          } yield {
       val gaps = for {
         booking <- location.bookings

@@ -6,7 +6,7 @@ case class Event(
                   id: Option[Event.Id],
                   title: String,
                   theme: String,
-                  organizer: Person @@ OrganizerTag,
+                  organizerId: Person.Id ,
                   organizerCost: Money,
                   status: EventStatus,
                   created: DateTime,

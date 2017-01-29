@@ -5,18 +5,29 @@ import scala.language.implicitConversions
 import javax.naming.LimitExceededException
 
 import scala.reflect.api.TypeTags
-import shapeless.Poly
+import shapeless.{LabelledGeneric, Poly}
 
 object QueryDSL {
 
-  class ObjectMeta[T,This<:ObjectMeta[T,This]](val metaTableName:String)
+  abstract class ObjectMeta[T,This<:ObjectMeta[T,This]](val metaTableName:String)
   {
+    type Self = This
+
     def select = new TableSelectionExpression[This]()
 
     def field[F](name:String, isId:Boolean=false, optional:Boolean=false) =
       new ObjectFieldMeta[T,F,This](isId,name,optional,this)
 
+    def toMap(x:T):Map[Symbol,Any]
+
   }
+
+  trait FieldType[T] {
+    type FieldType = T
+  }
+
+  def select[T](implicit om:ObjectMeta[T,_]) = om.select
+
 
   class ObjectFieldMeta[O,T,OM <: ObjectMeta[O,OM]](
                                  val isId: Boolean,
@@ -26,14 +37,20 @@ object QueryDSL {
                                ) extends FieldExpression[T]
   {
 
+    type ObjectType = O
+    type MetaType = OM
+
+
     def === (other: FieldExpression[T]) = Equals(this,other)
     def =*= (other: FieldExpression[T]) = Equals(this,other)
 
     def !== (other: FieldExpression[T]) = NonEquals(this,other)
     def isNil = IsNil(this)
 
-    def <=(other: FieldExpression[T])(implicit o: Ordering[T]) = LessEq(this,other)
-    def >=(other: FieldExpression[T])(implicit o: Ordering[T]) = GreaterEq(this,other)
+    def < (other: FieldExpression[T])(implicit o: Ordering[T]) = Less(this,other,o)
+    def <=(other: FieldExpression[T])(implicit o: Ordering[T]) = LessEq(this,other,o)
+    def > (other: FieldExpression[T])(implicit o: Ordering[T]) = Greater(this,other,o)
+    def >=(other: FieldExpression[T])(implicit o: Ordering[T]) = GreaterEq(this,other,o)
 
     override def toString = s"field(${name})"
   }
@@ -62,7 +79,7 @@ object QueryDSL {
   case class OffsetExpression[T](origin:QueryExpression[T],lim:Int) extends QueryExpression[T]
 
 
-  sealed trait FieldExpression[T]
+  sealed trait FieldExpression[T] extends FieldType[T]
 
   case class Constant[T](val t:T) extends FieldExpression[T]
 
@@ -80,14 +97,30 @@ object QueryDSL {
   }
 
   sealed trait FieldComparison extends BooleanExpression
+  {
+    type FieldType
+    def x:FieldExpression[FieldType]
+    def y:FieldExpression[FieldType]
+  }
 
-  case class Equals[T](x:FieldExpression[T], y:FieldExpression[T]) extends FieldComparison
+  object FieldComparison
+  {
+    type Aux[T] = FieldComparison with FieldType[T]
+  }
 
-  case class NonEquals[T](x:FieldExpression[T], y:FieldExpression[T]) extends FieldComparison
 
-  case class LessEq[T](x:FieldExpression[T], y:FieldExpression[T])(implicit o:Ordering[T]) extends FieldComparison
 
-  case class GreaterEq[T](x:FieldExpression[T], y:FieldExpression[T])(implicit o:Ordering[T]) extends FieldComparison
+  case class Equals[T](x:FieldExpression[T], y:FieldExpression[T]) extends FieldComparison with FieldType[T]
+
+  case class NonEquals[T](x:FieldExpression[T], y:FieldExpression[T]) extends FieldComparison with FieldType[T]
+
+  case class Less[T](x:FieldExpression[T], y:FieldExpression[T], o:Ordering[T]) extends FieldComparison with FieldType[T]
+
+  case class LessEq[T](x:FieldExpression[T], y:FieldExpression[T], o:Ordering[T]) extends FieldComparison with FieldType[T]
+
+  case class Greater[T](x:FieldExpression[T], y: FieldExpression[T], o:Ordering[T]) extends FieldComparison with FieldType[T]
+
+  case class GreaterEq[T](x:FieldExpression[T], y:FieldExpression[T], o:Ordering[T]) extends FieldComparison with FieldType[T]
 
 
   case class IsNil[T](x:FieldExpression[T]) extends BooleanExpression
