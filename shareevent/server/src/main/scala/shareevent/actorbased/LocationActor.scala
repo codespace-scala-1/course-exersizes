@@ -24,7 +24,7 @@ case class PreBookReply(boolean: Boolean) extends LocationMessage
 
 
 
-class LocationActor(id:Location.Id, name:String, capacity:java.lang.Integer,coordinate:Coordinate) extends Actor {
+class LocationActor(id:Location.Id, name:String, capacity:java.lang.Integer,coordinate:Coordinate) extends PersitentActor {
 
   //val (id)
 
@@ -48,8 +48,7 @@ class LocationActor(id:Location.Id, name:String, capacity:java.lang.Integer,coor
     }
     case Confirm(item) =>
       val oldBookings = state.bookings
-      val index = oldBookings.indexWhere(booking =>
-                                item.eventId == booking.eventId)
+      val index = oldBookings.indexWhere(booking => item.eventId == booking.eventId)
       if (index != -1) {
         val newBooking = oldBookings(index).copy(status=BookingStatus.Final)
 
@@ -60,14 +59,21 @@ class LocationActor(id:Location.Id, name:String, capacity:java.lang.Integer,coor
         logicSupervisor ! "impossible"
       }
 
-    case Cancel(item) => 3
-    case CancelEvent(item) => 4
+    case Cancel(item) =>
+      val newBookings = state.bookings.filter(b => b.eventId == item.eventId)
+      state = state.copy(bookings = newBookings)
+
+    case CancelEvent(event) =>
+      val newBookings = state.bookings.filter(b => b.eventId == event.id)
+      state = state.copy(bookings = newBookings)
     //case _ => ???
   }
 
   def logicSupervisor: ActorRef = ???
 
-  def addBooking(bookinga: Seq[Booking]):Try[Seq[Booking]] = ???
+  def addBooking(bookingg: Seq[Booking]):Try[Seq[Booking]] = ???
+
+
 
 }
 

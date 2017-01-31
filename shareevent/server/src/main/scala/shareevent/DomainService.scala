@@ -25,7 +25,7 @@ trait DomainService[M[_]] {
                      endSchedule: DateTime,
                      coordination: Coordinate,
                      costs: Money): DomainContext[M] => M[Location]
-
+   // Kleisly(M,DomainContext[M],Location)
 
   /**
     * If participant is interested in event, he can participate
