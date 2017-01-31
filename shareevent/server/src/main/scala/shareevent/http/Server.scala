@@ -21,6 +21,8 @@ object Server extends App {
 
   val binding = Http().bindAndHandle(route, "0.0.0.0", 8080)
 
+
+
   System.out.println("Server online at http://localhost:8080/\nPress RETURN to stop...");
   System.in.read(); // let it run until user presses return
 

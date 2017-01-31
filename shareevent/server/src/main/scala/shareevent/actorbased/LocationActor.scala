@@ -2,14 +2,17 @@ package shareevent.actorbased
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.actor.Actor.Receive
+import akka.persistence.{PersistentActor, SnapshotOffer}
 import akka.util.Timeout
 import shareevent.model.{Booking, BookingStatus, Coordinate, Event, Location, ScheduleItem}
 
+import scala.language.postfixOps
 import scala.concurrent._
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 
 sealed trait LocationMessage
+sealed trait LocationReplyMessage
 
 
 
@@ -20,18 +23,17 @@ case class Confirm(scheduleItem: ScheduleItem) extends LocationMessage
 case class Cancel(scheduleItem: ScheduleItem) extends LocationMessage
 case class CancelEvent(id: Event.Id) extends LocationMessage
 
-case class PreBookReply(boolean: Boolean) extends LocationMessage
+case class PreBookReply(boolean: Boolean) extends LocationReplyMessage
 
 
 
-class LocationActor(id:Location.Id, name:String, capacity:java.lang.Integer,coordinate:Coordinate) extends PersitentActor {
+class LocationActor(id:Location.Id, name:String, capacity:java.lang.Integer,coordinate:Coordinate) extends PersistentActor {
 
   //val (id)
 
   var state: Location = Location(Some(id),name,capacity,coordinate)
 
-  override def receive: Receive = {
-
+  def updateState: LocationMessage => Unit = {
     case HiLocationMessage =>
       System.err.println("Hi received!")
     case PreBook(item) => {
@@ -73,8 +75,21 @@ class LocationActor(id:Location.Id, name:String, capacity:java.lang.Integer,coor
 
   def addBooking(bookingg: Seq[Booking]):Try[Seq[Booking]] = ???
 
+  override def receiveRecover: Receive = {
+    case msg: LocationMessage => updateState(msg)
+      //context.system.eventStream.
+    case SnapshotOffer(metadata,snapshot:Location) =>
+              state = snapshot
 
+  }
 
+  override def receiveCommand: Receive = {
+    case message: LocationMessage =>
+           persist(message)(updateState)
+    case SnaphotEvent => saveSnapshot(state)
+  }
+
+  override def persistenceId: String = s"location-${state.id.get}"
 }
 
 object LocationActor {
@@ -86,14 +101,17 @@ object LocationActor {
                    name: String
                   )(implicit actorSystem:ActorSystem): ActorRef = {
     val properties = props(id, name, 5, Coordinate(0, 0))
-    actorSystem.actorOf(properties,actorName(id))
+    val supervisorProps = LocationSupervisor.props(properties,actorName(id))
+    actorSystem.actorOf(supervisorProps,superviserName)
   }
 
   def find(id:Location.Id)(implicit actorSystem:ActorSystem): Future[ActorRef] =
   {
-    actorSystem.actorSelection("/user/"+actorName(id)).resolveOne(1 seconds)
+    actorSystem.actorSelection(superviserName+"/"+actorName(id)).resolveOne(1 seconds)
   }
 
-  def actorName(id:Location.Id) = s"location-${id.id}"
+  def superviserName="/user/location"
+
+  def actorName(id:Location.Id) = id.toString
 
 }
