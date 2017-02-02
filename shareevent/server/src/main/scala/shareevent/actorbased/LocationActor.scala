@@ -4,8 +4,10 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.actor.Actor.Receive
 import akka.persistence.{PersistentActor, SnapshotOffer}
 import akka.util.Timeout
+import org.joda.time.Interval
 import shareevent.model.{Booking, BookingStatus, Coordinate, Event, Location, ScheduleItem}
 
+import scala.annotation.tailrec
 import scala.language.postfixOps
 import scala.concurrent._
 import scala.concurrent.duration._
@@ -39,7 +41,7 @@ class LocationActor(id:Location.Id, name:String, capacity:java.lang.Integer,coor
     case PreBook(item) => {
       System.err.println("PreBook received!")
       val oldBookings = state.bookings
-      val r = addBooking(oldBookings) match {
+      val r = addBooking(oldBookings, item) match {
         case Failure(ex) => false
         case Success(newBookings) =>
               state = state.copy(bookings = newBookings)
@@ -73,7 +75,32 @@ class LocationActor(id:Location.Id, name:String, capacity:java.lang.Integer,coor
 
   def logicSupervisor: ActorRef = ???
 
-  def addBooking(bookingg: Seq[Booking]):Try[Seq[Booking]] = ???
+  def addBooking(bookings: Seq[Booking], item: ScheduleItem):Try[Seq[Booking]] =
+  {
+    @tailrec
+    def add(prev:Seq[Booking],current:Seq[Booking]):Seq[Booking]=
+    {
+
+      //TODO: retrieve event ?
+      val itemInterval = new Interval(item.time,item.time.plusHours(2))
+
+      def createBooking(): Booking =
+        new Booking( itemInterval ,item.eventId)
+
+      current.headOption match {
+        case None => (createBooking() +: prev).reverse
+        case Some(h) => if (h.time.isBefore(item.time)) {
+          add(h +: prev, current.tail)
+        }  else if (h.time.isAfter(itemInterval.getEnd)) {
+          (createBooking() +: prev).reverse ++ current.tail
+        }  else {
+          throw new IllegalArgumentException("time is overlapped")
+        }
+      }
+
+    }
+    Try(add(Nil,bookings))
+  }
 
   override def receiveRecover: Receive = {
     case msg: LocationMessage => updateState(msg)
