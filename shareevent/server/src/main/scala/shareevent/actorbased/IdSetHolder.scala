@@ -18,6 +18,7 @@ class IdSetHolder[K,T](name:String, meta: ObjectMeta[T,_]) extends PersistentAct
 
   var state: Set[K] = Set()
 
+
   override def receiveRecover: Receive = {
     case x: IdSetStateChangeMessage => updateState(x)
     case SnapshotOffer(_,snapshot) => //saveSnapshot(s)

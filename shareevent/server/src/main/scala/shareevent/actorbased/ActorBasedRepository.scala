@@ -30,7 +30,7 @@ class ActorBasedRepository(implicit val actorSystem:ActorSystem ) extends Reposi
   implicit val mMonad: cats.Monad[Future] = new FutureMonad
   implicit val tryToMonad = shareevent.TryToFuture
 
-  abstract class ActorBasedDAO[K,T] extends DAO[K,T] {
+  abstract class ActorBasedDAO[K,T](val pathName:String) extends DAO[K,T] {
 
     override def query[MT <: ObjectMeta[T, MT]](q: QueryExpression[MT]): Future[Seq[T]] = ???
 
@@ -47,13 +47,16 @@ class ActorBasedRepository(implicit val actorSystem:ActorSystem ) extends Reposi
 
 
 
-  val locationDAO = new ActorBasedDAO[Location.Id,Location] {
+  val locationDAO = new ActorBasedDAO[Location.Id,Location]("locations") {
+
 
     override def store(obj: Location): Future[Location] = {
        if (obj.id.isEmpty) {
-         val id: Location.Id = ??? // generatre
-         val ref = LocationActor.createOrFind(id,obj.name)
-         (ref ? Store(obj)).mapTo[Location]
+         for{idv <- (IdGenerator.createOrFind(pathName) ? NextId).mapTo[NextIdReply]
+             id = Location.id(idv.id)
+             ref = LocationActor.createOrFind(id,obj.name)
+             location <- (ref ? Store(obj)).mapTo[Location]
+             } yield  location
        } else {
          Future successful obj
        }
