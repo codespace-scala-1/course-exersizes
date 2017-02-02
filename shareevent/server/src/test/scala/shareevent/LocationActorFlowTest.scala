@@ -33,6 +33,7 @@ class LocationActorFlowTest extends TestKit(ActorSystem(
   val someTime = DateTime.now()
   val scalaUaEventId = Event.id(1L)
   val successfulPrebookReply = PreBookReply(true)
+  val failedPrebookReply = PreBookReply(false)
 
   val testLocationRef = system.actorOf(LocationActor.propsFromLocation(testLocation))
   // prebook event -> cancel, check state (bookings do not contain this one)
@@ -48,6 +49,8 @@ class LocationActorFlowTest extends TestKit(ActorSystem(
                                    locationId = testLocationId,
                                    time = someTime,
                                    participants = Seq[Person.Id]())
+  val scheduleItem2 = scheduleItem1.copy(eventId = Event.id(2L))
+
   "locationActor" should {
     "cancel pre-booked event" in {
       testLocationRef ! PreBook(scheduleItem1)
@@ -61,6 +64,13 @@ class LocationActorFlowTest extends TestKit(ActorSystem(
       val newStateCancelled = expectMsgType[Location]
       println(newStateCancelled.bookings)
       newStateCancelled.bookings shouldBe 'empty
+    }
+
+    "fail to prebook two events for the same time" in {
+      testLocationRef ! PreBook(scheduleItem1)
+      expectMsgType[Any]
+      testLocationRef ! PreBook(scheduleItem2)
+      expectMsg(failedPrebookReply)
     }
   }
 
