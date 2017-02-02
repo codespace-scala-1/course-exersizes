@@ -2,13 +2,23 @@
 import cats._
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 package object shareevent {
 
   implicit object TryId extends (Try ~> Try) {
 
     override def apply[A](fa: Try[A]): Try[A] = fa
+
+  }
+
+  implicit object TryToFuture extends (Try ~> Future) {
+
+    override def apply[A](fa: Try[A]): Future[A] =
+      fa match {
+        case Success(x) => Future successful x
+        case Failure(ex) => Future failed ex
+      }
 
   }
 
