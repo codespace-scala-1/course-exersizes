@@ -18,7 +18,7 @@ case class Person (
                   )
 
 
-object Person
+object Person extends Function6[String,String,Role.Value, Option[String],Option[String],Option[String],Person]
 {
   type Id = String
 }

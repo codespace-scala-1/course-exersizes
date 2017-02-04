@@ -20,7 +20,7 @@ lazy val commonSettings = Seq(
     "org.typelevel" %% "cats" % "0.9.0",
     "com.typesafe.akka" %% "akka-persistence" % "2.4.16",
     "com.typesafe.akka" %% "akka-persistence-query-experimental" % "2.4.16"
-  )
+)
 )
 
 
@@ -32,7 +32,14 @@ lazy val server = (project in file("server"))
   .settings(commonSettings: _*)
   .settings(
     resolvers += Resolver.bintrayRepo("hseeberger", "maven"),
-    libraryDependencies += "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test
+    resolvers += "typesafe" at "https://repo.typesafe.com/typesafe/releases/",
+    libraryDependencies ++= Seq(
+        "com.typesafe.slick" %% "slick" % "3.2.0-M2",
+        "com.typesafe.slick" %% "slick-hikaricp" % "3.2.0-M2",
+        "com.zaxxer" % "HikariCP" % "2.5.1",
+        "com.h2database" % "h2" % "1.4.193",
+        "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test
+    )
   )
 
 lazy val clientParticipant = (project in file("client-participant")).settings(commonSettings: _*)
