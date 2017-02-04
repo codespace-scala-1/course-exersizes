@@ -2,6 +2,7 @@ package shareevent.simplemodel
 
 import java.util.concurrent.atomic.AtomicLong
 
+import scala.language.higherKinds
 import cats.arrow.FunctionK
 import cats.{Apply, Id, Monad, ~>}
 import shapeless.LabelledGeneric
@@ -11,6 +12,7 @@ import shareevent.persistence.Repository
 
 import scala.util.{Success, Try}
 import scala.reflect.runtime._
+
 
 
 class SimpleInMemRepository(implicit override val mMonad:Monad[Try],
@@ -158,12 +160,12 @@ class SimpleInMemRepository(implicit override val mMonad:Monad[Try],
   import Repository.Objects._
 
   override val personDAO: DAO[String, Person] = new SimpleInMemDAO[String,Person](
-                                                      p => Some(p.login), (k,p)=>p.copy(login=k))
+    p => Some(p.login), (k,p)=>p.copy(login=k))
   override val locationDAO: DAO[Location.Id, Location] = new SimpleInMemDAO[Location.Id,Location](
-                                                       _.id, (k,t) => t.copy(id=Some(k))
+    _.id, (k,t) => t.copy(id=Some(k))
                                                  )
   override val eventsDAO: DAO[Event.Id, Event] = new SimpleInMemDAO[Event.Id,Event](
-                                                        _.id, (k,t) => t.copy(id=Some(k))
+    _.id, (k,t) => t.copy(id=Some(k))
                                                  )
 
 }

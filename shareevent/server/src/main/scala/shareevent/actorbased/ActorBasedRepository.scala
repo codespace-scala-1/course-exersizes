@@ -54,7 +54,7 @@ class ActorBasedRepository(implicit val actorSystem:ActorSystem ) extends Reposi
        if (obj.id.isEmpty) {
          for{idv <- (IdGenerator.createOrFind(pathName) ? NextId).mapTo[NextIdReply]
              id = Location.id(idv.id)
-             ref = LocationActor.createOrFind(id,obj.name)
+             ref <- LocationActor.createOrFind(id,obj.name)
              location <- (ref ? Store(obj)).mapTo[Location]
              } yield  location
        } else {

@@ -27,7 +27,7 @@ object ActorActivitiesInitializer {
     actorSystem.scheduler.schedule(initialDelay = 5 minutes,
       interval = 5 minute
      ){
-      actorSystem.actorSelection(s"${LocationActor.superviserName}/*")!SnaphotEvent
+      actorSystem.actorSelection(s"/user/${LocationSupervisor.name}/*")!SnaphotEvent
     }
 
     if (externalReadDBEnabled) {

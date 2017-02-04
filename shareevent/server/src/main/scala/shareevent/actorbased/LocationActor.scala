@@ -1,17 +1,17 @@
 package shareevent.actorbased
 
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
-import akka.actor.Actor.Receive
 import akka.persistence.{PersistentActor, SnapshotOffer}
+import akka.pattern.ask
 import akka.util.Timeout
 import org.joda.time.Interval
-import shareevent.model.{Booking, BookingStatus, Coordinate, Event, Location, ScheduleItem}
 
 import scala.annotation.tailrec
 import scala.language.postfixOps
 import scala.concurrent._
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
+import shareevent.model._
 
 sealed trait LocationMessage
 sealed trait LocationReplyMessage
@@ -26,6 +26,7 @@ case class Cancel(scheduleItem: ScheduleItem) extends LocationMessage
 case class CancelEvent(id: Event.Id) extends LocationMessage
 
 case class PreBookReply(boolean: Boolean) extends LocationReplyMessage
+
 
 
 
@@ -52,7 +53,8 @@ class LocationActor(id:Location.Id, name:String, capacity:java.lang.Integer,coor
     }
     case Confirm(item) =>
       val oldBookings = state.bookings
-      val index = oldBookings.indexWhere(booking => item.eventId == booking.eventId)
+      val index = oldBookings.indexWhere(booking =>
+                                item.eventId == booking.eventId)
       if (index != -1) {
         val newBooking = oldBookings(index).copy(status=BookingStatus.Final)
 
@@ -117,6 +119,7 @@ class LocationActor(id:Location.Id, name:String, capacity:java.lang.Integer,coor
   }
 
   override def persistenceId: String = s"location-${state.id.get}"
+
 }
 
 object LocationActor {
@@ -126,19 +129,21 @@ object LocationActor {
 
   def createOrFind(id: Location.Id,
                    name: String
-                  )(implicit actorSystem:ActorSystem): ActorRef = {
+                  )(implicit actorSystem:ActorSystem): Future[ActorRef] = {
     val properties = props(id, name, 5, Coordinate(0, 0))
-    val supervisorProps = LocationSupervisor.props(properties,actorName(id))
-    actorSystem.actorOf(supervisorProps,superviserName)
+    val supervisor = LocationSupervisor.createOrFind()
+    implicit val timeout = Timeout(1 minute) // TODO: timeout in settings
+    (supervisor ? CreateActor(properties,name)).mapTo[ActorRef]
   }
 
   def find(id:Location.Id)(implicit actorSystem:ActorSystem): Future[ActorRef] =
   {
-    actorSystem.actorSelection(superviserName+"/"+actorName(id)).resolveOne(1 seconds)
+    val supervisorName = LocationSupervisor.name
+    actorSystem.actorSelection(s"/user/${supervisorName}/${actorName(id)}").resolveOne(1 seconds)
   }
 
-  def superviserName="/user/location"
 
   def actorName(id:Location.Id) = id.toString
+
 
 }

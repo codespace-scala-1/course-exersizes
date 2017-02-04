@@ -10,6 +10,7 @@ package object model {
   def toTagged[T,U](v:T): T @@ U =
     v.asInstanceOf[T @@ U]
 
+
   implicit class optToTry[T<:PersistenceId[_,_]](val v: Option[T]) extends AnyVal
   {
     def toTry: Try[T] = v.toRight(new IllegalStateException("Object id not set")).toTry
