@@ -19,6 +19,8 @@ case class Event(
 object Event
 {
   type Id = PersistenceId[Long,Event]
+
+  def id(l:Long) = new Id(l)
 }
 
 

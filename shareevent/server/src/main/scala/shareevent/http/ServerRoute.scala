@@ -33,24 +33,24 @@ class ServerRoute[M[_]](implicit actorSystem: ActorSystem,
                   service: DomainService[Try]) extends Json4sSupport {
   //important: both formats and serialization implicits need to be in scope
   val defaultFormats = Serialization.formats(NoTypeHints) + new EnumSerializer(Role)
-  val personFormats = new CustomSerializer[Person](formats => (
+  def personFormats(defaultRole: Role.Role) = new CustomSerializer[Person](formats => (
     { case p: JObject =>
         implicit val formats = defaultFormats
-        val pWithRole = p merge JObject(JField("role", JInt(Role.Participant.id)) :: Nil) //TODO: what happens if JObject already contains role
+        val pWithRole = p merge JObject(JField("role", JInt(defaultRole.id)) :: Nil) //TODO: what happens if JObject already contains role
         pWithRole.extract[Person]
     },
-    PartialFunction.empty
-    /*{ case p: Person =>
+    { case p: Person =>
         implicit val formats = defaultFormats
         val jsWithRole = Extraction.decompose(p)
         jsWithRole.removeField{
           case ("role", _) => true
           case _ => false
+        }.transformField{
+          case ("password", _) => ("password", JString("***"))
         }
-    }*/
+    }
     ))
 
-  implicit val formats = defaultFormats + personFormats
   implicit val serialization = Serialization
   private val challenge = HttpChallenge("Basic", "realm")
 
@@ -72,27 +72,27 @@ class ServerRoute[M[_]](implicit actorSystem: ActorSystem,
       Future.successful(authResult)
     }
 
-  val route =
-    path("participant") {
-      //TODO:  serialize person without role
-      (post & entity(as[Person])) { participant =>
-        val storeResult:Try[Person] =
-          for {op <- context.repository.personDAO.retrieve(participant.login)
-               _ <- op.map(p => new IllegalArgumentException("participant already exists")).toLeft[Unit](()).toTry
-               stored <- context.repository.personDAO.store(participant)
-          } yield stored
+  def userServiceRoute(role: Role.Role) = path(role.toString.toLowerCase) {
+    implicit val formats = defaultFormats + personFormats(role)
 
-        onComplete(Future.fromTry(storeResult)) {
-          case Success(entity) => complete(OK -> entity)
-          case Failure(ex)    => complete(Conflict -> ex.getMessage)
-        }
-      } ~
+    (post & entity(as[Person])) { person =>
+      val storeResult:Try[Person] =
+        for {op <- context.repository.personDAO.retrieve(person.login)
+             _ <- op.map(p => new IllegalArgumentException(role + " already exists")).toLeft[Unit](()).toTry
+             stored <- context.repository.personDAO.store(person)
+        } yield stored
+
+      onComplete(Future.fromTry(storeResult)) {
+        case Success(entity) => complete(OK -> entity)
+        case Failure(ex)    => complete(Conflict -> ex.getMessage)
+      }
+    } ~
       delete {
         authenticateOrRejectWithChallenge(myUserPassAuthenticator).apply { userId =>
           parameter('login.as[String]) { login =>
 
             if(userId != login) {
-              complete(Conflict -> "Not authorized to delete other participant")
+              complete(Conflict -> ("Not authorized to delete other " + role))
             }
             else {
               context.repository.personDAO.retrieve(login) match {
@@ -103,6 +103,9 @@ class ServerRoute[M[_]](implicit actorSystem: ActorSystem,
           }
         }
       }
-    }
+  }
+
+  val route =
+    userServiceRoute(Role.Participant) ~ userServiceRoute(Role.Organizer)
 
 }

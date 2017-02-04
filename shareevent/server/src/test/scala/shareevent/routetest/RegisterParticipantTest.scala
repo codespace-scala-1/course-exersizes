@@ -35,7 +35,9 @@ class RegisterParticipantTest extends WordSpec with Matchers with ServerRouteTes
       Post("/participant", personJs) ~> route ~> check {
         response.status shouldEqual StatusCodes.OK
         val jsResponse = responseAs[JValue]
-        jsResponse \ "role" shouldEqual JInt(Role.Participant.id)
+        jsResponse \ "login" shouldEqual JString("yar")
+        jsResponse \ "password" shouldEqual JString("***")
+        jsResponse \ "role" shouldEqual JNothing
       }
     }
 
@@ -52,7 +54,7 @@ class RegisterParticipantTest extends WordSpec with Matchers with ServerRouteTes
 
         val s = Await.result(f, 1 second)
 
-        s should include("participant already exists")
+        s should include("Participant already exists")
 
 
       }

@@ -13,17 +13,18 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 import shareevent.model._
 
-sealed trait LocationMessage
+sealed trait LocationCommand
+sealed trait LocationQuery
 sealed trait LocationReplyMessage
 
 
+case object HiLocationMessage extends LocationCommand
 
-case object HiLocationMessage extends LocationMessage
-
-case class PreBook(scheduleItem: ScheduleItem) extends LocationMessage
-case class Confirm(scheduleItem: ScheduleItem) extends LocationMessage
-case class Cancel(scheduleItem: ScheduleItem) extends LocationMessage
-case class CancelEvent(id: Event.Id) extends LocationMessage
+case class PreBook(scheduleItem: ScheduleItem) extends LocationCommand
+case class Confirm(scheduleItem: ScheduleItem) extends LocationCommand
+case class Cancel(scheduleItem: ScheduleItem) extends LocationCommand
+case class CancelEvent(id: Event.Id) extends LocationCommand
+case object GetState extends LocationQuery
 
 case class PreBookReply(boolean: Boolean) extends LocationReplyMessage
 
@@ -36,7 +37,7 @@ class LocationActor(id:Location.Id, name:String, capacity:java.lang.Integer,coor
 
   var state: Location = Location(Some(id),name,capacity,coordinate)
 
-  def updateState: LocationMessage => Unit = {
+  def updateState: LocationCommand => Unit = {
     case HiLocationMessage =>
       System.err.println("Hi received!")
     case PreBook(item) => {
@@ -66,11 +67,12 @@ class LocationActor(id:Location.Id, name:String, capacity:java.lang.Integer,coor
       }
 
     case Cancel(item) =>
-      val newBookings = state.bookings.filter(b => b.eventId == item.eventId)
+      //TODO: add another condition for filterNot to match on event time
+      val newBookings = state.bookings.filterNot(_.eventId == item.eventId)
       state = state.copy(bookings = newBookings)
 
     case CancelEvent(event) =>
-      val newBookings = state.bookings.filter(b => b.eventId == event.id)
+      val newBookings = state.bookings.filterNot(_.eventId == event.id)
       state = state.copy(bookings = newBookings)
     //case _ => ???
   }
@@ -105,17 +107,17 @@ class LocationActor(id:Location.Id, name:String, capacity:java.lang.Integer,coor
   }
 
   override def receiveRecover: Receive = {
-    case msg: LocationMessage => updateState(msg)
+    case msg: LocationCommand => updateState(msg)
       //context.system.eventStream.
     case SnapshotOffer(metadata,snapshot:Location) =>
               state = snapshot
-
   }
 
   override def receiveCommand: Receive = {
-    case message: LocationMessage =>
+    case message: LocationCommand =>
            persist(message)(updateState)
     case SnaphotEvent => saveSnapshot(state)
+    case GetState => sender ! state
   }
 
   override def persistenceId: String = s"location-${state.id.get}"
@@ -126,6 +128,9 @@ object LocationActor {
 
   def props(id: Location.Id, name: String, capacity: Int, coordinate: Coordinate): Props =
     Props(classOf[LocationActor], id.id, name, capacity, coordinate)
+
+  def propsFromLocation(location: Location): Props =
+    props(location.id.get, location.name, location.capacity, location.coordinate)
 
   def createOrFind(id: Location.Id,
                    name: String
