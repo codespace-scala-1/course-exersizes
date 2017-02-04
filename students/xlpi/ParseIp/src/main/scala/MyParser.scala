@@ -12,12 +12,8 @@ object MyParser {
       case None => println("Wrong IP template!, must be [0-255].[0-255].[0-255].[0-255]")
     }
 
-    // parse IP from String and print result
     val resultIP: Array[Byte] = parser.parseIp(stringIP).get
 
-    // TODO chek print default
-    println("default printArray[Byte]: "+resultIP)
-
-    parser.printIpFromByte(resultIP)
+    println(parser.printIpFromByte(resultIP))
   }
 }

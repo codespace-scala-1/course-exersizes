@@ -1,7 +1,6 @@
 package ParseIP
 
 import org.scalatest._
-import org.scalatest.FunSpec
 
 class MyParserTest extends FunSuite with BeforeAndAfterAll {
 

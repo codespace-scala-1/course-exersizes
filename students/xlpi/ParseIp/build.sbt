@@ -1,14 +1,16 @@
 name := "ParseIp"
 
-version := "1.0"
+version := "0.99"
+
+lazy val client = (project in file(".")).
+  settings(
+    name := "ParseIp"
+  )
 
 scalaVersion := "2.12.1"
 
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % "3.0.1" % "test",
-  "org.scodec" %% "scodec-core" % "1.10.2",
-  "org.scodec" %% "scodec-bits" % "1.1.0",
-  "org.scodec" %% "scodec-protocols" % "1.0.0-M5"
+  "org.scalatest" %% "scalatest" % "3.0.1" % Test
 )
 
-## in previous step not compiled sbt with ScalaTestDependencies....it will be demeged...
+resolvers += "Sonatype Public" at "https://oss.sonatype.org/content/groups/public/"
