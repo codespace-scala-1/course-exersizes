@@ -14,7 +14,7 @@ case class ParserIp(inputString: String)  // TODO returned
         Some(byteArr)
       }
       catch {
-        case e: Exception => None// TODO exactly error handling or tranzit up
+        case e: Exception => throw NoSuchMethodError
       }
     }
 
