@@ -1,6 +1,6 @@
-package codespace_scala_1.xlpi.ParseIP
+package ParseIP
 
-import codespace_scala_1.xlpi.ParseIP.ParserIp
+import ParserIp
 
 object MyParser {
 
