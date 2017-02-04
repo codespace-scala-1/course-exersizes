@@ -20,6 +20,9 @@ object QueryDSL {
 
     def toMap(x:T):Map[Symbol,Any]
 
+    // 'aas   'ssss
+    //'a == 'a
+
   }
 
   trait FieldType[T] {

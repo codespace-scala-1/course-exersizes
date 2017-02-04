@@ -21,6 +21,9 @@ case class Person (
 object Person extends Function6[String,String,Role.Value, Option[String],Option[String],Option[String],Person]
 {
   type Id = String
+
+  // F3:  (A,B,C)=>D
+  // F3.tupled:  Tuple3[A,B,C]=>D
 }
 
 

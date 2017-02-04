@@ -19,7 +19,9 @@ class LocationSuperviser extends Actor
   override def receive: Receive =
   {
     case CreateActor(props,name) =>
-      val ref = context.actorOf(props,name)
+
+      val ref = context.actorOf(props,name)  // actorPath/name
+                //actorSystem.actorOf(props,name) => /user/name
       sender() ! ref
   }
 

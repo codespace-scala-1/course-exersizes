@@ -1,9 +1,8 @@
 package shareevent.rdbbased
 
 import shareevent.model.{Person, Role}
+
 import slick.jdbc.H2Profile.api._
-
-
 
 
 object DBSchema {
@@ -26,9 +25,8 @@ object DBSchema {
   }
 
 
-
-
   val persons = TableQuery[Persons]
 
+  //persons.filter(p => p.login === "A")
 
 }
