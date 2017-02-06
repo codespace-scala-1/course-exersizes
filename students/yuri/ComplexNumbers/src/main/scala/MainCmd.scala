@@ -16,8 +16,8 @@ object MainCmd {
     println(two)
     println(a / b)
 
-    val aa = ComplexNumber(1, 2)
-    println(aa / ComplexNumber(0, 0))
+    val aa = ComplexNumber[Double](1, 2)
+    println(aa / ComplexNumber[Double](0, 0))
 
   }
 }
