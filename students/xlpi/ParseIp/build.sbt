@@ -2,7 +2,7 @@ name := "ParseIp"
 
 version := "0.99"
 
-lazy val client = (project in file(".")).
+lazy val parseIp = (project in file(".")).
   settings(
     name := "ParseIp"
   )
