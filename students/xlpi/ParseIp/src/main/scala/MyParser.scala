@@ -18,7 +18,7 @@ object MyParser {
         "," + resultIP(2) + "," + resultIP(3) + "} " + Console.RESET + " " +
         "<-- result saving in Array[Byte]")
       println(s"${Console.GREEN} ${parser.IpFromByte(resultIP)} ${Console.RESET} <-- parsed IP\n")
-      println(Console.BLINK + s"Press ENTER to begin, or print x exit" + Console.RESET)
+      println(Console.BLINK + s"Press ENTER to run ParserIP, or print x exit" + Console.RESET)
     } while (!(in.readLine() == "x"))
   }
 }

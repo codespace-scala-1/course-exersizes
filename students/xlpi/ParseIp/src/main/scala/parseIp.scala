@@ -7,7 +7,7 @@ case class ParserIp(inputString: String)  // TODO returned
     def apply(inputString: String): ParserIp = ParserIp(inputString)
 
     def parseIp(inputP: String): Array[Byte] = {
-        val splitArrayString = inputP.split('.') // check working only if . separeted
+        val splitArrayString = inputP.split('.') //TODO check validIp: working only if . separeted
         val byteArr = new Array[Byte](4)
         for (i <- 0 until byteArr.length) {
           byteArr(i) = (splitArrayString(i).toInt & 0xff).toByte
