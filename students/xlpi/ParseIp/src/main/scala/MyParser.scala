@@ -1,6 +1,7 @@
 package ParseIP
 
 import java.io.{BufferedReader, InputStreamReader}
+import ParserIp._
 
 object MyParser {
 
@@ -9,16 +10,12 @@ object MyParser {
   def main(args: Array[String]) {
 
     do {
-      val stringIP = io.StdIn.readLine("Enter IP, please, to parse it to Array[Byte]. " + Console.BLACK_B +
-        "// IP  must be as [0-255].[0-255].[0-255].[0-255]\n" + Console.RESET + Console.GREEN)
-      print(Console.RESET)
+      val stringIP = greetingReadLine
       val parser = new ParserIp(stringIP)
       val resultIP: Array[Byte] = parser.parseIp(stringIP)
-      println(Console.YELLOW + "{" + resultIP(0) + "," + resultIP(1) +
-        "," + resultIP(2) + "," + resultIP(3) + "} " + Console.RESET + " " +
-        "<-- result saving in Array[Byte]")
+      printFromArray(resultIP)
       println(s"${Console.GREEN} ${parser.IpFromByte(resultIP)} ${Console.RESET} <-- parsed IP\n")
-      println(Console.BLINK + s"Press ENTER to run ParserIP, or print x exit" + Console.RESET)
+      printAgainExit
     } while (!(in.readLine() == "x"))
   }
 }
