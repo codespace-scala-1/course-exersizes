@@ -1,5 +1,4 @@
-Delete me
- training materials for codespace scala course
+training materials for codespace scala course
 
 разбирайте задачки:
 
